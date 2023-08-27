@@ -4,8 +4,10 @@
     "baseUrl": ".",
     "paths": {
       "@components": ["src/components"],
+      "@lib": ["src/lib"],
+      "@navigation": ["src/navigation"],
       "@screens": ["src/screens"],
-      "@lib": ["src/lib"]
+      "@stores": ["src/stores"]
     },
     "resolveJsonModule": true,
     "allowJs": false,

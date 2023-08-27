@@ -1,14 +1,9 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  useColorScheme,
-} from 'react-native';
+import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
 import colors from 'tailwindcss/colors';
 
-import {BaseText} from '@components';
+import {NavigationWrapper} from '@navigation';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -23,12 +18,7 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        style={{
-          backgroundColor: isDarkMode ? colors.black : colors.white,
-        }}>
-        <BaseText>This is some text</BaseText>
-      </ScrollView>
+      <NavigationWrapper />
     </SafeAreaView>
   );
 }

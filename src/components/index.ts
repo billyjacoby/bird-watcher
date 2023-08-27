@@ -1,1 +1,2 @@
-export * from './base-text';
+export * from './baseText';
+export * from './baseView';

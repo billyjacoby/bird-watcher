@@ -1,4 +1,10 @@
-const internalPaths = ['@components', 'screens', 'lib'];
+const internalPaths = [
+  '@components',
+  '@lib',
+  '@navigation',
+  '@screens',
+  '@stores',
+];
 
 module.exports = {
   root: true,
