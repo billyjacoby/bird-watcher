@@ -1,3 +1,4 @@
+//TODO
 import {useQuery} from 'react-query';
 
 import {API_BASE} from '@env';
@@ -9,9 +10,9 @@ interface Todo {
   userId: number;
 }
 
-const fetchAllTodos = async () => {
+const fetchAllCameras = async () => {
   try {
-    const response = await fetch(API_BASE, {method: 'get'});
+    const response = await fetch(`${API_BASE}/`, {method: 'get'});
     const data = await response.json();
     if (response.ok) {
       if (data.todos) {
@@ -25,8 +26,8 @@ const fetchAllTodos = async () => {
   }
 };
 
-export const useAllTodos = () =>
+export const useAllCameras = () =>
   useQuery({
-    queryFn: fetchAllTodos,
-    queryKey: ['todos'],
+    queryFn: fetchAllCameras,
+    queryKey: ['cameras'],
   });

@@ -13,6 +13,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
     "clsx": "^2.0.0",
@@ -56,6 +57,10 @@
   },
   "engines": {
     "node": ">=16"
+  },
+  "resolutions": {
+    "@babel/core": "^7.20.2",
+    "babel-loader": "^8.3.0"
   },
   "packageManager": "yarn@3.6.3"
 }

@@ -1,10 +1,10 @@
 import {ActivityIndicator} from 'react-native';
 
 import {BaseText, BaseView} from '@components';
-import {useAllTodos} from '@hooks';
+import {useConfig} from '@hooks';
 
-export const TodosScreen = () => {
-  const {data, isLoading, error} = useAllTodos();
+export const CamerasScreen = () => {
+  const {data, isLoading, error} = useConfig();
 
   if (isLoading) {
     return (
@@ -25,10 +25,8 @@ export const TodosScreen = () => {
   }
 
   return (
-    <BaseView>
-      {data?.map(todo => (
-        <BaseText key={todo.id}>{todo.todo}</BaseText>
-      ))}
+    <BaseView isScrollview>
+      <BaseText>{JSON.stringify(data, null, 2)}</BaseText>
     </BaseView>
   );
 };

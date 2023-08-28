@@ -1,32 +1,55 @@
 import {useColorScheme} from 'react-native';
 
-import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {
+  NavigationContainer,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import colors from 'tailwindcss/colors';
 
-import {HomeScreen, TodosScreen} from '@screens';
+import {CamerasScreen, HomeScreen, OnBoardingScreen} from '@screens';
 
 export type MainStackParamList = {
-  Home: undefined;
-  Todos: undefined;
+  Tabs: NavigatorScreenParams<TabsStackParamList>;
+  Onboarding: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
-export const NavigationWrapper = () => {
+export type TabsStackParamList = {
+  Home: undefined;
+  Cameras: undefined;
+};
+
+const TabStack = createBottomTabNavigator<TabsStackParamList>();
+
+const TabNavigator = () => {
   const isDarkMode = useColorScheme() === 'dark';
+
+  return (
+    <TabStack.Navigator
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: isDarkMode ? colors.black : colors.white,
+        },
+        header: () => null,
+      }}>
+      <TabStack.Screen name="Home" component={HomeScreen} />
+      <TabStack.Screen name="Cameras" component={CamerasScreen} />
+    </TabStack.Navigator>
+  );
+};
+
+export const NavigationWrapper = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerTintColor: isDarkMode ? colors.white : colors.black,
-          headerShadowVisible: false,
-          headerStyle: {
-            backgroundColor: isDarkMode ? colors.black : colors.white,
-          },
+          header: () => null,
         }}>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Todos" component={TodosScreen} />
+        <Stack.Screen name="Tabs" component={TabNavigator} />
+        <Stack.Screen name="Onboarding" component={OnBoardingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
