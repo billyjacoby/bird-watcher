@@ -1,5 +1,7 @@
 const internalPaths = [
+  '@env',
   '@components',
+  '@hooks',
   '@lib',
   '@navigation',
   '@screens',

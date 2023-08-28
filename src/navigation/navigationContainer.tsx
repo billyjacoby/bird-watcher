@@ -4,11 +4,11 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import colors from 'tailwindcss/colors';
 
-import {HomeScreen} from '@screens';
+import {HomeScreen, TodosScreen} from '@screens';
 
 export type MainStackParamList = {
   Home: undefined;
-  Settings: undefined;
+  Todos: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -26,7 +26,7 @@ export const NavigationWrapper = () => {
           },
         }}>
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Settings" component={HomeScreen} />
+        <Stack.Screen name="Todos" component={TodosScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
