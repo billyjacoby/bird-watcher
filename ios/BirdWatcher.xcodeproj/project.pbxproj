@@ -502,7 +502,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.billyjacoby.birdwatcher;
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.billyjacoby.BirdWatcher;
 				PRODUCT_NAME = BirdWatcher;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -531,7 +531,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.billyjacoby.birdwatcher;
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.billyjacoby.BirdWatcher;
 				PRODUCT_NAME = BirdWatcher;
 				SWIFT_VERSION = 5.0;

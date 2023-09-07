@@ -2,7 +2,9 @@ import {useQuery} from 'react-query';
 
 import {API_BASE} from '@env';
 
-interface Config {}
+interface Config {
+  cameras: object[];
+}
 
 const URL = `${API_BASE}/config`;
 const fetchConfig = async () => {

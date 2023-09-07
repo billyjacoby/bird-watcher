@@ -5,6 +5,10 @@ import {useConfig} from '@hooks';
 
 export const CamerasScreen = () => {
   const {data, isLoading, error} = useConfig();
+  console.log(
+    '🪵 | file: camerasScreen.tsx:8 | CamerasScreen | data:',
+    JSON.stringify(data?.go2rtc, null, 2),
+  );
 
   if (isLoading) {
     return (
@@ -26,7 +30,7 @@ export const CamerasScreen = () => {
 
   return (
     <BaseView isScrollview>
-      <BaseText>{JSON.stringify(data, null, 2)}</BaseText>
+      <BaseText>{JSON.stringify(data.cameras, null, 2)}</BaseText>
     </BaseView>
   );
 };

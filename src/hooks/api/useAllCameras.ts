@@ -2,6 +2,7 @@
 import {useQuery} from 'react-query';
 
 import {API_BASE} from '@env';
+import {useConfig} from '@hooks';
 
 interface Todo {
   id: number;
@@ -10,7 +11,7 @@ interface Todo {
   userId: number;
 }
 
-const fetchAllCameras = async () => {
+const fetchAllCameras = async (cameraNames: string[]) => {
   try {
     const response = await fetch(`${API_BASE}/`, {method: 'get'});
     const data = await response.json();
@@ -26,8 +27,14 @@ const fetchAllCameras = async () => {
   }
 };
 
-export const useAllCameras = () =>
-  useQuery({
-    queryFn: fetchAllCameras,
+export const useAllCameras = () => {
+  const {data: config} = useConfig();
+
+  const cameraNames = Object.keys(config?.cameras || {});
+
+  return useQuery({
+    queryFn: () => fetchAllCameras(cameraNames),
     queryKey: ['cameras'],
+    enabled: !!cameraNames?.length,
   });
+};
