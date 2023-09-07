@@ -2,8 +2,11 @@ import React from 'react';
 
 import {MediaStream, RTCPeerConnection, RTCView} from 'react-native-webrtc';
 
+import {API_BASE} from '@env';
+
 export const WebRTCPOC = () => {
-  const url = 'ws://10.0.1.179:5000/live/webrtc/api/ws?src=frigate_garage';
+  const url =
+    API_BASE.replace('http', 'ws') + '/live/webrtc/api/ws?src=frigate_garage';
   const config = {
     iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
   };

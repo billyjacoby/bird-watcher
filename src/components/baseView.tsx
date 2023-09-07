@@ -17,7 +17,7 @@ export const BaseView = (props: BaseViewProps) => {
   if (props.isScrollview) {
     return (
       <ScrollView
-        contentContainerStyle={{flex: 1}}
+        contentContainerStyle={{minHeight: '95%'}}
         className={clsx(isDarkMode ? 'bg-black' : 'bg-white', 'flex-1')}
         {...props}
       />

@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 
 import {API_BASE} from '@env';
 
@@ -23,8 +23,23 @@ const fetchConfig = async () => {
   }
 };
 
-export const useConfig = () =>
+export const useConfig = <TData = Config>(
+  options?: UseQueryOptions<
+    Config | undefined,
+    unknown,
+    TData | undefined,
+    string[]
+  >,
+) =>
   useQuery({
     queryFn: fetchConfig,
     queryKey: ['config'],
+    ...options,
+  });
+
+export const useAllCameraNames = () =>
+  useConfig<string[]>({
+    select: data => {
+      return Object.keys(data?.cameras ?? []);
+    },
   });

@@ -1,2 +1,2 @@
-export * from './useAllCameras';
+export * from './useCameraEvents';
 export * from './useConfig';

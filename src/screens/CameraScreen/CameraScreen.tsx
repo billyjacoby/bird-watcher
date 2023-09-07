@@ -1,14 +1,11 @@
 import {ActivityIndicator} from 'react-native';
 
+import {CameraEvent} from './components';
 import {BaseText, BaseView} from '@components';
-import {useConfig} from '@hooks';
+import {useAllCameraNames} from '@hooks';
 
 export const CamerasScreen = () => {
-  const {data, isLoading, error} = useConfig();
-  console.log(
-    '🪵 | file: camerasScreen.tsx:8 | CamerasScreen | data:',
-    JSON.stringify(data?.go2rtc, null, 2),
-  );
+  const {data: cameraNames, isLoading, error} = useAllCameraNames();
 
   if (isLoading) {
     return (
@@ -18,7 +15,7 @@ export const CamerasScreen = () => {
     );
   }
 
-  if (error || (!isLoading && !data)) {
+  if (error || (!isLoading && !cameraNames)) {
     return (
       <BaseView>
         <BaseText className="text-red-800 text-lg">
@@ -30,7 +27,9 @@ export const CamerasScreen = () => {
 
   return (
     <BaseView isScrollview>
-      <BaseText>{JSON.stringify(data.cameras, null, 2)}</BaseText>
+      {cameraNames?.map(name => (
+        <CameraEvent key={name} cameraName={name} />
+      ))}
     </BaseView>
   );
 };
