@@ -3,6 +3,7 @@ import React from 'react';
 import {MediaStream, RTCPeerConnection, RTCView} from 'react-native-webrtc';
 
 import {API_BASE} from '@env';
+import {Text} from 'react-native';
 
 const webRTCconfig = {
   iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
@@ -16,6 +17,8 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
   const cameraURL =
     API_BASE.replace('http', 'ws') + '/live/webrtc/api/ws?src=' + cameraName;
 
+  const [reload, setReload] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [remoteStream, setRemoteStream] = React.useState<MediaStream | null>(
     null,
   );
@@ -26,11 +29,22 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
   const pcRef = React.useRef<RTCPeerConnection | null>(null);
   const wsRef = React.useRef<WebSocket | null>(null);
 
+  function onIceConnect() {
+    if (pcRef?.current?.iceConnectionState === 'connected') {
+      setLoading(false);
+    }
+  }
+
   const connect = React.useCallback(async (url: string) => {
+    setLoading(true);
     pcRef.current = new RTCPeerConnection(webRTCconfig);
+    const pc = pcRef.current;
+
+    // add this before connecting to websocket.
+    pcRef.current.addEventListener('iceconnectionstatechange', onIceConnect);
+
     wsRef.current = new WebSocket(url);
 
-    const pc = pcRef.current;
     const ws = wsRef.current;
 
     const tracks = [
@@ -45,15 +59,12 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
 
     setLocalStream(new MediaStream(tracks));
 
-    pc.addEventListener('track', (event: any) => {
+    const remoteMediaStream = new MediaStream(undefined);
+
+    pc.addEventListener('track', async (event: any) => {
       // Grab the remote track from the connected participant.
       const track = event?.track;
       if (track) {
-        const remoteMediaStream = new MediaStream(undefined);
-        console.log(
-          '🪵 | file: webRTCpoc.tsx:58 | ws.addEventListener | track:',
-          track,
-        );
         remoteMediaStream.addTrack(event.track);
         setRemoteStream(remoteMediaStream);
       }
@@ -65,6 +76,7 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
         if (!ev.candidate) {
           return;
         }
+
         const msg = {
           type: 'webrtc/candidate',
           value: ev.candidate.candidate,
@@ -91,24 +103,44 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
         pc.setRemoteDescription({type: 'answer', sdp: msg.value});
       }
     });
+
+    let attempts = 0;
+    // while not connected or completed
+    while (!pc.iceConnectionState.includes('co')) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+
+      if (attempts > 5) {
+        throw new Error('Could not connect');
+      }
+    }
+
+    // we no longer want to listen to connected state change events
+    pc.removeEventListener('iceconnectedstatechange', onIceConnect);
   }, []);
 
   React.useEffect(() => {
     if (cameraURL && cameraName) {
-      connect(cameraURL);
+      connect(cameraURL).catch(() => {
+        setReload(!reload);
+      });
     }
 
     return () => {
       remoteStream?.getTracks().forEach(t => t.stop());
-      remoteStream?.release();
+      remoteStream?.release(true);
       localStream?.getTracks().forEach(t => t.stop());
       localStream?.release();
       pcRef?.current?.close();
     };
-  }, [cameraURL, cameraName]);
+  }, [cameraURL, cameraName, reload]);
 
   if (!cameraName) {
     return null;
+  }
+
+  if (loading) {
+    return <Text>Loading ...</Text>;
   }
 
   if (remoteStream) {
@@ -120,5 +152,5 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
       />
     );
   }
-  return null;
+  return <Text>No video stream set</Text>;
 };
