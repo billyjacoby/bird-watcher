@@ -10,9 +10,9 @@ export const HomeScreen = () => {
 
   return (
     <BaseView isScrollview className="pb-4">
+      <WebRTCPOC cameraName="frigate_front_door" />
       <BaseText className="text-3xl">Home Screen</BaseText>
       <View className="border-white border-2 mt-auto rounded-lg mx-10">
-        <WebRTCPOC />
         <Button
           title="View Cameras"
           onPress={() => navigation.navigate('Tabs', {screen: 'Cameras'})}

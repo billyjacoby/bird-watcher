@@ -6,7 +6,7 @@ interface Config {
   cameras: object[];
 }
 
-const URL = `${API_BASE}/config`;
+const URL = `${API_BASE}api/config`;
 const fetchConfig = async () => {
   try {
     const response = await fetch(URL, {method: 'get'});

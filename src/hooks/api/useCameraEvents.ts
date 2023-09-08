@@ -2,7 +2,7 @@ import {useQuery} from 'react-query';
 
 import {API_BASE} from '@env';
 
-const URL = `${API_BASE}/events`;
+const URL = `${API_BASE}api/events`;
 
 interface FrigateEvent {
   //? Unsure what the non null types should be here
