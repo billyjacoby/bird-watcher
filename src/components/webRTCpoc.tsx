@@ -40,12 +40,10 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
     setLoading(true);
     pcRef.current = new RTCPeerConnection(webRTCconfig);
     const pc = pcRef.current;
-
-    // add this before connecting to websocket.
+    // add this before connecting to websocket to ensure it is always captured.
     pcRef.current.addEventListener('iceconnectionstatechange', onIceConnect);
 
     wsRef.current = new WebSocket(url);
-
     const ws = wsRef.current;
 
     const tracks = [
@@ -105,9 +103,14 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
       }
     });
 
+    // the following is to ensure that ice connection eventually becomes connected or completed
+    // as it can get stuck in other states which are an error state
     let attempts = 0;
-    // while not connected or completed
-    while (!pc.iceConnectionState.includes('co')) {
+    while (
+      pc.iceConnectionState !== 'connected' &&
+      pc.iceConnectionState !== 'completed'
+    ) {
+      // async timeout for 100ms
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
 
@@ -123,6 +126,7 @@ export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
   React.useEffect(() => {
     if (cameraURL && cameraName) {
       connect(cameraURL).catch(() => {
+        // toggle the reload value on error so this useEffect will run again
         setReload(!reload);
       });
     }
