@@ -1,9 +1,10 @@
 import React from 'react';
 
+import {Text} from 'react-native';
+
 import {MediaStream, RTCPeerConnection, RTCView} from 'react-native-webrtc';
 
 import {API_BASE} from '@env';
-import {Text} from 'react-native';
 
 const webRTCconfig = {
   iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
