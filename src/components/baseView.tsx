@@ -24,10 +24,7 @@ export const BaseView = (props: BaseViewProps) => {
     );
   } else {
     return (
-      <View
-        className={clsx(isDarkMode ? 'bg-black' : 'bg-white', 'flex-1')}
-        {...props}
-      />
+      <View className={clsx(isDarkMode ? 'bg-black' : 'bg-white')} {...props} />
     );
   }
 };
