@@ -43,15 +43,6 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
     }
   };
 
-  const onTrack = async (event: any, mediaStream: MediaStream) => {
-    // Grab the remote track from the connected participant.
-    const track = event?.track;
-    if (track) {
-      mediaStream.addTrack(track);
-      setRemoteStream(mediaStream);
-    }
-  };
-
   const setLocalAvailability = (peerConnection: RTCPeerConnection) => {
     //? This sets the tracks on the local device, should before anything else i think
     const tracks = [
@@ -116,14 +107,21 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
 
     const mediaStream = new MediaStream(undefined);
 
+    // onTrack event handler as named fn so it can be removed
+    const onTrack = async (event: any) => {
+      // Grab the remote track from the connected participant.
+      const track = event?.track;
+      if (track) {
+        mediaStream.addTrack(track);
+        setRemoteStream(mediaStream);
+      }
+    };
+
     pc.addEventListener('iceconnectionstatechange', onIceConnect);
 
     setLocalAvailability(pc);
     //? Add our local tracks (recieve only)
-    pc.addEventListener(
-      'track',
-      async (ev: any) => await onTrack(ev, mediaStream),
-    );
+    pc.addEventListener('track', onTrack);
 
     ws.addEventListener('open', () => {
       pc.addEventListener('icecandidate', onIceCandidate);
@@ -153,10 +151,7 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
 
     // we no longer want to listen to connected state change events
     pc.removeEventListener('iceconnectedstatechange', onIceConnect);
-    pc.removeEventListener(
-      'track',
-      async (ev: any) => await onTrack(ev, mediaStream),
-    );
+    pc.removeEventListener('track', onTrack);
   }, []);
 
   React.useEffect(() => {
