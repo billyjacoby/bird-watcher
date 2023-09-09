@@ -1,7 +1,7 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
-import {BaseText, BaseView, WebRTCPOC} from '@components';
+import {BaseText, BaseView, WebRTCView} from '@components';
 import {useAllCameraNames} from '@hooks';
 
 export const HomeScreen = () => {
@@ -51,7 +51,7 @@ export const HomeScreen = () => {
       </BaseView>
       {currentCamera && (
         <BaseView className="flex-1">
-          <WebRTCPOC cameraName={currentCamera} />
+          <WebRTCView cameraName={currentCamera} />
           <BaseText>Viewing: {currentCamera}</BaseText>
         </BaseView>
       )}

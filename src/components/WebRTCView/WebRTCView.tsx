@@ -3,8 +3,7 @@ import {ActivityIndicator, Text, TouchableOpacity} from 'react-native';
 
 import {MediaStream, RTCPeerConnection, RTCView} from 'react-native-webrtc';
 
-import {BaseText} from './baseText';
-import {BaseView} from './baseView';
+import {BaseText, BaseView} from '@components';
 import {API_BASE} from '@env';
 
 const webRTCconfig = {
@@ -17,7 +16,7 @@ interface WebRTCPocProps {
 
 const MAX_RETRIES = 10;
 
-export const WebRTCPOC = ({cameraName}: WebRTCPocProps) => {
+export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
   const cameraURL =
     API_BASE.replace('http', 'ws') + '/live/webrtc/api/ws?src=' + cameraName;
 
