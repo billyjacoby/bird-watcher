@@ -43,13 +43,12 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
     }
   };
 
-  const onTrack = async (event: any) => {
+  const onTrack = async (event: any, mediaStream: MediaStream) => {
     // Grab the remote track from the connected participant.
     const track = event?.track;
     if (track) {
-      const remoteMediaStream = new MediaStream(undefined);
-      remoteMediaStream.addTrack(track);
-      setRemoteStream(remoteMediaStream);
+      mediaStream.addTrack(track);
+      setRemoteStream(mediaStream);
     }
   };
 
@@ -115,11 +114,16 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
     wsRef.current = new WebSocket(url);
     const ws = wsRef.current;
 
+    const mediaStream = new MediaStream(undefined);
+
     pc.addEventListener('iceconnectionstatechange', onIceConnect);
 
     setLocalAvailability(pc);
     //? Add our local tracks (recieve only)
-    pc.addEventListener('track', onTrack);
+    pc.addEventListener(
+      'track',
+      async (ev: any) => await onTrack(ev, mediaStream),
+    );
 
     ws.addEventListener('open', () => {
       pc.addEventListener('icecandidate', onIceCandidate);
@@ -149,7 +153,10 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
 
     // we no longer want to listen to connected state change events
     pc.removeEventListener('iceconnectedstatechange', onIceConnect);
-    pc.removeEventListener('track', onTrack);
+    pc.removeEventListener(
+      'track',
+      async (ev: any) => await onTrack(ev, mediaStream),
+    );
   }, []);
 
   React.useEffect(() => {
@@ -179,7 +186,7 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
     return (
       <BaseView className="flex-1 mt-4 px-6">
         <BaseText className="text-center mb-2 text-red-600 text-lg">
-          Unable to load streme for {cameraName}
+          Unable to load stream for {cameraName}
         </BaseText>
         <TouchableOpacity
           className="self-center border border-red-700 p-3 px-6 rounded-md"
