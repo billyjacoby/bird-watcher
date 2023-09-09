@@ -7,7 +7,7 @@
     "ios": "react-native run-ios --simulator='iPhone 14'",
     "pod": "cd ios && pod install && cd ../",
     "format": "eslint . --fix",
-    "lint": "eslint .",
+    "lint": "eslint . --quiet",
     "type-check": "tsc --noEmit",
     "start": "react-native start",
     "test": "jest"

@@ -52,7 +52,7 @@ export const HomeScreen = () => {
       {currentCamera && (
         <BaseView className="flex-1">
           <WebRTCPOC cameraName={currentCamera} />
-          <BaseText>Vieweing: {currentCamera}</BaseText>
+          <BaseText>Viewing: {currentCamera}</BaseText>
         </BaseView>
       )}
     </BaseView>
