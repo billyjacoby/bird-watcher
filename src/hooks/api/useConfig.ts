@@ -2,9 +2,7 @@ import {useQuery, UseQueryOptions} from 'react-query';
 
 import {API_BASE} from '@env';
 
-interface Config {
-  cameras: object[];
-}
+import {FrigateConfig} from './types/config';
 
 const URL = `${API_BASE}api/config`;
 const fetchConfig = async () => {
@@ -13,7 +11,7 @@ const fetchConfig = async () => {
     const data = await response.json();
     if (response.ok) {
       if (data) {
-        return Promise.resolve(data as Config);
+        return Promise.resolve(data as FrigateConfig);
       }
     } else {
       return Promise.reject(new Error('ResNotOK'));
@@ -23,9 +21,9 @@ const fetchConfig = async () => {
   }
 };
 
-export const useConfig = <TData = Config>(
+export const useConfig = <TData = FrigateConfig>(
   options?: UseQueryOptions<
-    Config | undefined,
+    FrigateConfig | undefined,
     unknown,
     TData | undefined,
     string[]

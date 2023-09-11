@@ -23,6 +23,7 @@ interface FrigateEvent {
   sub_label: null | string;
   thumbnail: string;
   top_score: number;
+  snapshotURL?: string;
 }
 
 interface CameraEventParams extends Record<string, string | undefined> {
@@ -38,7 +39,31 @@ interface CameraEventParams extends Record<string, string | undefined> {
   in_progress?: string;
 }
 
-const fetchEvents = async (queryParams?: CameraEventParams) => {
+interface SnapshotQueryParams extends Record<string, string | undefined> {
+  h?: string;
+  bbox?: string;
+  timestamp?: string;
+  crop?: string;
+  quality?: string;
+}
+
+const buildSnapshotURL = (
+  eventId: string,
+  queryParams?: SnapshotQueryParams,
+) => {
+  let params: URLSearchParams | undefined;
+  let url = URL + `/${eventId}/snapshot.jpg`;
+  if (queryParams) {
+    params = new URLSearchParams(queryParams as Record<string, string>);
+    url = url + '?' + params;
+  }
+  return url;
+};
+
+const fetchEvents = async (
+  queryParams?: CameraEventParams,
+  snapShotQueryParams?: SnapshotQueryParams,
+) => {
   let params: URLSearchParams | undefined;
   if (queryParams) {
     params = new URLSearchParams(queryParams as Record<string, string>);
@@ -50,7 +75,16 @@ const fetchEvents = async (queryParams?: CameraEventParams) => {
     const data = await response.json();
     if (response.ok) {
       if (data) {
-        return Promise.resolve(data as FrigateEvent[]);
+        const returnData: FrigateEvent[] = [];
+        for (const event of data) {
+          if (event.has_snapshot) {
+            const snapshotURL = buildSnapshotURL(event.id, snapShotQueryParams);
+            returnData.push({...event, snapshotURL});
+          } else {
+            returnData.push(event);
+          }
+        }
+        return Promise.resolve(returnData);
       }
     } else {
       return Promise.reject(new Error('ResNotOK'));
