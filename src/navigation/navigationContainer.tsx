@@ -6,9 +6,13 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import colors from 'tailwindcss/colors';
 
 import {CamerasScreen, HomeScreen, OnBoardingScreen} from '@screens';
+
+//? Can't figure out how to properly type this
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import {colors, hslFunction} from '../../themeColors.js';
 
 export type MainStackParamList = {
   Tabs: NavigatorScreenParams<TabsStackParamList>;
@@ -31,7 +35,9 @@ const TabNavigator = () => {
     <TabStack.Navigator
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: isDarkMode ? colors.black : colors.white,
+          backgroundColor: isDarkMode
+            ? hslFunction(colors.dark.background)
+            : hslFunction(colors.light.background),
         },
         header: () => null,
       }}>

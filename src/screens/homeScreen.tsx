@@ -32,8 +32,8 @@ export const HomeScreen = () => {
   };
 
   return (
-    <BaseView isScrollview className="pb-4">
-      <BaseText className="text-3xl mb-4 self-center">
+    <BaseView isScrollview>
+      <BaseText className="text-3xl mb-4 self-center text-foreground dark:text-foreground-dark">
         WebRTC Test Screen
       </BaseText>
 

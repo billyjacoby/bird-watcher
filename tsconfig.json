@@ -16,5 +16,5 @@
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true
   },
-  "include": ["src", "./types", "./types/index.d.ts"]
+  "include": ["src", "./types", "./types/index.d.ts", "./themeColors.js"]
 }

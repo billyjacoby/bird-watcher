@@ -1,10 +1,8 @@
-import {Text, TextProps, useColorScheme} from 'react-native';
+import {Text, TextProps} from 'react-native';
 
 export const BaseText = ({children, ...props}: TextProps) => {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
-    <Text className={isDarkMode ? 'text-white' : 'text-black'} {...props}>
+    <Text className="text-foreground dark:text-foreground-dark" {...props}>
       {children}
     </Text>
   );
