@@ -1,3 +1,14 @@
+/**
+ * I'm thinking that we need to separate our connect function from the event
+ * handlers. It seems that now we're re-adding the handlers on every iteration of connect
+ * even if that handler is already there, which seems like it could definitely be problematic.
+ * Creating separate setup and cleanup functions that are called on mount and unmount
+ * then calling the connect function seems like it's the way forward here.
+ *
+ * I'm unsure if we really *need* to move the RCTPeerConnection into it's own Context, but
+ * it also seems like the kind of thing that doesn't need to be instantiated more than a single time
+ */
+
 import React from 'react';
 import {ActivityIndicator, Text, TouchableOpacity} from 'react-native';
 
@@ -6,21 +17,22 @@ import {MediaStream, RTCPeerConnection, RTCView} from 'react-native-webrtc';
 import {BaseText, BaseView} from '@components';
 import {API_BASE} from '@env';
 
+interface WebRTCViewProps {
+  cameraName?: string;
+}
+
 const webRTCconfig = {
   iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
 };
 
-interface WebRTCPocProps {
-  cameraName?: string;
-}
-
 const MAX_RETRIES = 10;
 
-export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
+export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
   const cameraURL =
     API_BASE.replace('http', 'ws') + '/live/webrtc/api/ws?src=' + cameraName;
 
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [retryAttempts, setRetryAttempts] = React.useState(0);
   const [shouldRetry, setShouldRetry] = React.useState(false);
   const [remoteStream, setRemoteStream] = React.useState<MediaStream | null>(
@@ -29,6 +41,7 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
   const [localStream, setLocalStream] = React.useState<MediaStream | null>(
     null,
   );
+  const [isWsOpen, setIsWsOpen] = React.useState(false);
 
   const isError = retryAttempts > MAX_RETRIES;
 
@@ -37,8 +50,10 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
   );
   const wsRef = React.useRef<WebSocket>(new WebSocket(cameraURL));
 
+  const peerConnection = pcRef.current;
+
   const onIceConnect = () => {
-    if (pcRef?.current?.iceConnectionState === 'connected') {
+    if (peerConnection?.iceConnectionState === 'connected') {
       setIsLoading(false);
     }
   };
@@ -47,20 +62,21 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
     // Grab the remote track from the connected participant.
     const track = event?.track;
     if (track) {
+      setIsConnected(true);
       const remoteMediaStream = new MediaStream(undefined);
       remoteMediaStream.addTrack(track);
       setRemoteStream(remoteMediaStream);
     }
   };
 
-  const setLocalAvailability = (peerConnection: RTCPeerConnection) => {
+  const setLocalAvailability = (pc: RTCPeerConnection) => {
     //? This sets the tracks on the local device, should before anything else i think
     const tracks = [
-      peerConnection.addTransceiver('video', {
+      pc.addTransceiver('video', {
         direction: 'recvonly',
         // codecs: ['H264'],
       }).receiver.track,
-      peerConnection.addTransceiver('audio', {
+      pc.addTransceiver('audio', {
         direction: 'recvonly',
       }).receiver.track,
     ];
@@ -86,55 +102,93 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
   };
 
   //? WS Handlers
-  const onWsOpen = async (pc: RTCPeerConnection, ws: WebSocket) => {
-    //? Websocket is how we're handling sdp negotiation with the frigate server
-    //? Creating the offer is what triggers the gathering of icecandidates
-    const offer = await pc.createOffer({});
-    await pc.setLocalDescription(offer);
 
-    if (pc.localDescription) {
-      const msg = {type: 'webrtc/offer', value: pc.localDescription.sdp};
-      ws.send(JSON.stringify(msg));
+  const onWsMessage = async (ev: any) => {
+    if (!peerConnection) {
+      console.error('NO PEER CONNECTION onWsMessage()');
+      return;
     }
-  };
+    const pc = peerConnection;
 
-  const onWsMessage = async (ev: any, pc: RTCPeerConnection) => {
     const msg = JSON.parse(ev.data);
     if (msg.type === 'webrtc/candidate') {
       pc.addIceCandidate(msg.value);
     } else if (msg.type === 'webrtc/answer') {
-      pc.setRemoteDescription({type: 'answer', sdp: msg.value});
+      if (!isConnected) {
+        pc.setRemoteDescription({type: 'answer', sdp: msg.value});
+      }
     }
   };
 
-  const connect = React.useCallback(async (url: string) => {
-    setIsLoading(true);
-    pcRef.current = new RTCPeerConnection(webRTCconfig);
-    const pc = pcRef.current;
+  const onWsOpen = () => {
+    setIsWsOpen(true);
+  };
+  const onWsClose = () => {
+    setIsWsOpen(false);
+  };
 
-    wsRef.current = new WebSocket(url);
+  const setupListeners = () => {
+    if (!peerConnection) {
+      throw 'No RTCPeerConnection found in setupListeners()';
+    }
     const ws = wsRef.current;
 
-    pc.addEventListener('iceconnectionstatechange', onIceConnect);
+    setLocalAvailability(peerConnection);
 
-    setLocalAvailability(pc);
-    //? Add our local tracks (recieve only)
-    pc.addEventListener('track', onTrack);
+    peerConnection.addEventListener('iceconnectionstatechange', onIceConnect);
+    peerConnection.addEventListener('track', onTrack);
+    peerConnection.addEventListener('icecandidate', onIceCandidate);
 
-    ws.addEventListener('open', () => {
-      pc.addEventListener('icecandidate', onIceCandidate);
-      //? Broadcast icecandidates to server
-      onWsOpen(pc, ws);
-    });
+    ws.addEventListener('open', onWsOpen);
+    ws.addEventListener('close', onWsClose);
+    ws.addEventListener('message', onWsMessage);
+  };
 
-    ws.addEventListener('message', ev => onWsMessage(ev, pc));
+  const cleanupListeners = () => {
+    if (!peerConnection) {
+      throw 'No RTCPeerConnection found in cleaupListeners()';
+    }
+    const ws = wsRef.current;
+
+    peerConnection.removeEventListener(
+      'iceconnectionstatechange',
+      onIceConnect,
+    );
+    peerConnection.removeEventListener('track', onTrack);
+    peerConnection.removeEventListener('icecandidate', onIceCandidate);
+
+    ws.removeEventListener('open', onWsOpen);
+    ws.removeEventListener('close', onWsClose);
+    ws.removeEventListener('message', onWsMessage);
+  };
+
+  const connect = async () => {
+    if (!peerConnection) {
+      throw 'No RTCPeerConnection found in connect()';
+    }
+    if (!isWsOpen) {
+      throw 'Websocket not open yet';
+    }
+    const pc = peerConnection;
+    const ws = wsRef.current;
+
+    setIsLoading(true);
+
+    const offer = await pc.createOffer({});
+    await pc.setLocalDescription(offer);
+
+    if (pc.localDescription && isWsOpen) {
+      //? Send our offer to the websocket and await an answer.
+      const msg = {type: 'webrtc/offer', value: pc.localDescription.sdp};
+      ws.send(JSON.stringify(msg));
+    }
 
     // the following is to ensure that ice connection eventually becomes connected or completed
     // as it can get stuck in other states which are an error state
     let attempts = 0;
     while (
-      pc.iceConnectionState !== 'connected' &&
-      pc.iceConnectionState !== 'completed'
+      peerConnection.iceConnectionState !== 'connected' &&
+      peerConnection.iceConnectionState !== 'completed'
     ) {
       // async timeout for 100ms
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -142,19 +196,31 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
 
       if (attempts > 5) {
         setRetryAttempts(prev => prev + 1);
+
         throw new Error('Could not connect');
       }
     }
     setRetryAttempts(0);
 
     // we no longer want to listen to connected state change events
-    pc.removeEventListener('iceconnectedstatechange', onIceConnect);
-    pc.removeEventListener('track', onTrack);
+  };
+
+  React.useEffect(() => {
+    //? Setup our event listeners, and cleanup when we're done
+    setupListeners();
+    setRetryAttempts(0);
+    return () => {
+      cleanupListeners();
+      remoteStream?.getTracks().forEach(t => t.stop());
+      remoteStream?.release(true);
+      localStream?.getTracks().forEach(t => t.stop());
+      localStream?.release();
+    };
   }, []);
 
   React.useEffect(() => {
     if (cameraURL && cameraName) {
-      connect(cameraURL).catch(() => {
+      connect().catch(() => {
         if (retryAttempts < MAX_RETRIES) {
           setShouldRetry(prev => !prev);
         }
@@ -162,14 +228,6 @@ export const WebRTCView = ({cameraName}: WebRTCPocProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraURL, cameraName, shouldRetry]);
-
-  React.useEffect(() => {
-    //? When the camera changes we want to close out the open streams.
-    remoteStream?.getTracks().forEach(t => t.stop());
-    remoteStream?.release(true);
-    localStream?.getTracks().forEach(t => t.stop());
-    localStream?.release();
-  }, [cameraURL]);
 
   if (!cameraName) {
     return null;

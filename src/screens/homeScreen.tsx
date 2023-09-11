@@ -51,7 +51,7 @@ export const HomeScreen = () => {
       </BaseView>
       {currentCamera && (
         <BaseView className="flex-1">
-          <WebRTCView cameraName={currentCamera} />
+          <WebRTCView cameraName={currentCamera} key={currentCamera} />
           <BaseText>Viewing: {currentCamera}</BaseText>
         </BaseView>
       )}
