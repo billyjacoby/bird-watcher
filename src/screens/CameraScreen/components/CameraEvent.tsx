@@ -1,14 +1,16 @@
 import React from 'react';
-import {ImageBackground, useWindowDimensions, View} from 'react-native';
+import {useWindowDimensions, View} from 'react-native';
 
-import {BaseText} from '@components';
-import {useCameraEvents} from '@hooks';
+import {ImageZoom} from '@likashefqet/react-native-image-zoom';
 
-export const CameraEvent = ({cameraName}: {cameraName: string}) => {
-  const {data} = useCameraEvents({cameras: cameraName, limit: '10'});
+import {Label} from './Label';
+import {BaseText, BaseView} from '@components';
+import {FrigateEvent} from '@hooks';
+
+export const CameraEvent = ({camEvent}: {camEvent: FrigateEvent}) => {
   const {width} = useWindowDimensions();
-  const imageSize = width * 0.97;
-  const lastEvent = data?.[0];
+  const imageWidth = width * 0.97;
+  const imageHeight = imageWidth * 0.75;
 
   const getDateString = (date: Date) => {
     return (
@@ -22,47 +24,74 @@ export const CameraEvent = ({cameraName}: {cameraName: string}) => {
     );
   };
 
-  const lastEventEnded =
-    lastEvent && getDateString(new Date(lastEvent?.end_time * 1000));
+  const lastEventEnded = getDateString(new Date(camEvent?.end_time * 1000));
 
-  const lastThumbnail =
-    lastEvent && 'data:image/png;base64,' + lastEvent.thumbnail;
-  const lastEventImage = lastEvent && lastEvent.snapshotURL;
+  const lastThumbnail = 'data:image/png;base64,' + camEvent.thumbnail;
+  const lastEventImage = camEvent && camEvent.snapshotURL;
 
   return (
-    <View className="p-2">
-      <View className="justify-between flex-row">
-        <BaseText className="text-md">
-          {cameraName.replaceAll('_', ' ').toLocaleUpperCase()}
-        </BaseText>
-        {!!lastEventEnded && (
-          <BaseText className="text-xs text-mutedForeground dark:text-mutedForeground-dark">
-            {lastEventEnded}
-          </BaseText>
-        )}
-      </View>
+    <BaseView className="px-2:" style={{width, minHeight: imageHeight}}>
       {(lastEventImage || lastThumbnail) && (
-        <View
-          className="self-center mt-2"
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            borderRadius: 8,
-            shadowColor: '#fff',
-            shadowOffset: {width: 0, height: 2},
-            shadowOpacity: 0.5,
-            shadowRadius: 2,
-          }}>
-          <ImageBackground
+        <View className="self-center my-2 border border-accent dark:border-accent-dark relative rounded-lg">
+          <ImageZoom
             source={{uri: lastEventImage ?? lastThumbnail}}
-            resizeMode="cover"
-            style={{height: imageSize, width: imageSize}}
-            // eslint-disable-next-line react-native/no-inline-styles
-            imageStyle={{
-              borderRadius: 8,
-            }}
+            resizeMode="contain"
+            style={{height: imageHeight, width: imageWidth, borderRadius: 8}}
+            className="justify-between absolute top-0"
           />
+          <View
+            className="justify-between flex-row absolute p-1"
+            style={{width: imageWidth}}>
+            <Label>
+              <BaseText className="text-md font-semibold">
+                {camEvent.label.replaceAll('_', ' ').toLocaleUpperCase()}
+              </BaseText>
+            </Label>
+            {!!lastEventEnded && (
+              <Label>
+                <BaseText className="text-xs text-mutedForeground dark:text-mutedForeground-dark">
+                  {lastEventEnded}
+                </BaseText>
+              </Label>
+            )}
+          </View>
+          {/* <View
+            className="justify-between flex-row my-1 px-1 absolute bottom-0"
+            style={{width: imageWidth}}>
+            <View className="flex-row gap-1">
+              <Label>
+                <BaseText className="text-md font-semibold text-mutedForeground dark:text-mutedForeground-dark">
+                  Events
+                </BaseText>
+              </Label>
+              {!!lastEventEnded && (
+                <Label>
+                  <BaseText className="text-xs text-mutedForeground dark:text-mutedForeground-dark">
+                    Recordings
+                  </BaseText>
+                </Label>
+              )}
+            </View>
+            <View className="flex-row gap-1">
+              <Label>
+                <BaseText className="text-mutedForeground dark:text-mutedForeground-dark">
+                  DT
+                </BaseText>
+              </Label>
+              <Label>
+                <BaseText className="text-mutedForeground dark:text-mutedForeground-dark">
+                  RC
+                </BaseText>
+              </Label>
+              <Label>
+                <BaseText className="text-mutedForeground dark:text-mutedForeground-dark">
+                  SP
+                </BaseText>
+              </Label>
+            </View>
+          </View> */}
         </View>
       )}
-    </View>
+    </BaseView>
   );
 };

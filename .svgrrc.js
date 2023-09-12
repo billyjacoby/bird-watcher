@@ -1,0 +1,6 @@
+module.exports = {
+  replaceAttrValues: {
+    '#000': '{props.fill}',
+    '#f00': '{props.fillSecondary}',
+  },
+};

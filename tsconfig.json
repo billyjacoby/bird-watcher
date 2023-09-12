@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@assets": ["src/assets"],
       "@components": ["src/components"],
       "@hooks": ["src/hooks"],
       "@lib": ["src/lib"],
@@ -16,5 +17,5 @@
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true
   },
-  "include": ["src", "./types", "./types/index.d.ts", "./themeColors.js"]
+  "include": ["./src", "./types", "./types/index.d.ts", "./themeColors.js"]
 }

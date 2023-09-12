@@ -1,6 +1,6 @@
 import {ActivityIndicator} from 'react-native';
 
-import {CameraEvent} from './components';
+import {CameraCard} from './components';
 import {BaseText, BaseView} from '@components';
 import {useAllCameraNames} from '@hooks';
 
@@ -26,9 +26,10 @@ export const CamerasScreen = () => {
   }
 
   return (
-    <BaseView isScrollview>
+    <BaseView isScrollview showsVerticalScrollIndicator={false}>
+      <BaseText className="text-2xl font-bold">Cameras</BaseText>
       {cameraNames?.map(name => (
-        <CameraEvent key={name} cameraName={name} />
+        <CameraCard key={name} cameraName={name} />
       ))}
     </BaseView>
   );

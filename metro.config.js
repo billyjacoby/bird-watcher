@@ -7,6 +7,17 @@ const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
  *
  * @type {import('metro-config').MetroConfig}
  */
-const config = {resetCache: true};
+
+const defConf = getDefaultConfig();
+const config = {
+  resetCache: true,
+  transformer: {
+    babelTransformerPath: require.resolve('react-native-svg-transformer'),
+  },
+  resolver: {
+    assetExts: defConf.resolver.assetExts.filter(ext => ext !== 'svg'),
+    sourceExts: [...defConf.resolver.sourceExts, 'svg'],
+  },
+};
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);

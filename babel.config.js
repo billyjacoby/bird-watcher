@@ -2,6 +2,7 @@ module.exports = {
   presets: ['module:metro-react-native-babel-preset'],
   plugins: [
     'nativewind/babel',
+    'react-native-reanimated/plugin',
     [
       'module:react-native-dotenv',
       {
@@ -20,6 +21,7 @@ module.exports = {
       {
         root: ['.'],
         alias: {
+          '@assets': './src/assets',
           '@components': './src/components',
           '@hooks': './src/hooks',
           '@lib': './src/lib',

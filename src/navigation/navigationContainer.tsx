@@ -1,5 +1,6 @@
 import {useColorScheme} from 'react-native';
 
+import CameraIcon from '@assets/icons/camera.svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
@@ -22,27 +23,45 @@ export type MainStackParamList = {
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export type TabsStackParamList = {
-  Home: undefined;
   Cameras: undefined;
+  Live: undefined;
 };
 
 const TabStack = createBottomTabNavigator<TabsStackParamList>();
 
 const TabNavigator = () => {
   const isDarkMode = useColorScheme() === 'dark';
-
+  //TODO: make work with tailwind theme...
   return (
     <TabStack.Navigator
-      screenOptions={{
+      screenOptions={({route}) => ({
+        // eslint-disable-next-line react/no-unstable-nested-components
+        tabBarIcon: ({color, size}) => {
+          if (route.name === 'Cameras') {
+            return (
+              <CameraIcon
+                height={size}
+                width={size}
+                fill={color}
+                fillSecondary={isDarkMode ? 'black' : 'white'}
+              />
+            );
+          } else if (route.name === 'Live') {
+            return null;
+          }
+        },
+        tabBarActiveTintColor: isDarkMode ? 'white' : 'black',
+        tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
+          borderTopWidth: 0,
           backgroundColor: isDarkMode
             ? hslFunction(colors.dark.background)
             : hslFunction(colors.light.background),
         },
         header: () => null,
-      }}>
-      <TabStack.Screen name="Home" component={HomeScreen} />
+      })}>
       <TabStack.Screen name="Cameras" component={CamerasScreen} />
+      <TabStack.Screen name="Live" component={HomeScreen} />
     </TabStack.Navigator>
   );
 };

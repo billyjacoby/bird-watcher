@@ -4,7 +4,7 @@ import {API_BASE} from '@env';
 
 const URL = `${API_BASE}api/events`;
 
-interface FrigateEvent {
+export interface FrigateEvent {
   //? Unsure what the non null types should be here
   area: null | any;
   box: null | any;
