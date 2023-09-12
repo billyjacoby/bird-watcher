@@ -64,6 +64,7 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     if (track) {
       setIsConnected(true);
       remoteStream.addTrack(track);
+      setRemoteStream(remoteStream);
     }
   };
 
