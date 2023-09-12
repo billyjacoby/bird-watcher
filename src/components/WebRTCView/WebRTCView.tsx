@@ -35,8 +35,8 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
   const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [retryAttempts, setRetryAttempts] = React.useState(0);
   const [shouldRetry, setShouldRetry] = React.useState(false);
-  const [remoteStream, setRemoteStream] = React.useState<MediaStream | null>(
-    null,
+  const [remoteStream, setRemoteStream] = React.useState<MediaStream>(
+    new MediaStream(undefined),
   );
   const [localStream, setLocalStream] = React.useState<MediaStream | null>(
     null,
@@ -63,9 +63,7 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     const track = event?.track;
     if (track) {
       setIsConnected(true);
-      const remoteMediaStream = new MediaStream(undefined);
-      remoteMediaStream.addTrack(track);
-      setRemoteStream(remoteMediaStream);
+      remoteStream.addTrack(track);
     }
   };
 
@@ -169,6 +167,7 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     if (!isWsOpen) {
       throw 'Websocket not open yet';
     }
+
     const pc = peerConnection;
     const ws = wsRef.current;
 
@@ -200,6 +199,7 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
         throw new Error('Could not connect');
       }
     }
+
     setRetryAttempts(0);
 
     // we no longer want to listen to connected state change events
@@ -237,7 +237,7 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     return (
       <BaseView className="flex-1 mt-4 px-6">
         <BaseText className="text-center mb-2 text-red-600 text-lg">
-          Unable to load streme for {cameraName}
+          Unable to load stream for {cameraName}
         </BaseText>
         <TouchableOpacity
           className="self-center border border-red-700 p-3 px-6 rounded-md"
