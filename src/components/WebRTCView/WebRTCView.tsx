@@ -12,7 +12,12 @@
 import React from 'react';
 import {ActivityIndicator, Text, TouchableOpacity} from 'react-native';
 
-import {MediaStream, RTCPeerConnection, RTCView} from 'react-native-webrtc';
+import {
+  MediaStream,
+  MediaStreamTrack,
+  RTCPeerConnection,
+  RTCView,
+} from 'react-native-webrtc';
 
 import {BaseText, BaseView} from '@components';
 import {API_BASE} from '@env';
@@ -32,61 +37,56 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     API_BASE.replace('http', 'ws') + '/live/webrtc/api/ws?src=' + cameraName;
 
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [isConnected, setIsConnected] = React.useState<boolean>(false);
   const [retryAttempts, setRetryAttempts] = React.useState(0);
   const [shouldRetry, setShouldRetry] = React.useState(false);
-  const [remoteStream, setRemoteStream] = React.useState<MediaStream | null>(
-    null,
-  );
-  const [localStream, setLocalStream] = React.useState<MediaStream | null>(
-    null,
+  const [remoteStream, setRemoteStream] = React.useState<MediaStream>(
+    new MediaStream(undefined),
   );
   const [isWsOpen, setIsWsOpen] = React.useState(false);
 
   const isError = retryAttempts > MAX_RETRIES;
 
-  const pcRef = React.useRef<RTCPeerConnection>(
-    new RTCPeerConnection(webRTCconfig),
-  );
+  const pcRef = React.useRef<RTCPeerConnection | null>(null);
   const wsRef = React.useRef<WebSocket>(new WebSocket(cameraURL));
 
-  const peerConnection = pcRef.current;
-
   const onIceConnect = () => {
+    const peerConnection = pcRef.current;
     if (peerConnection?.iceConnectionState === 'connected') {
       setIsLoading(false);
     }
   };
 
-  const onTrack = async (event: any) => {
-    // Grab the remote track from the connected participant.
-    const track = event?.track;
-    if (track) {
-      setIsConnected(true);
-      const remoteMediaStream = new MediaStream(undefined);
-      remoteMediaStream.addTrack(track);
-      setRemoteStream(remoteMediaStream);
-    }
-  };
-
+  //? Start webcam
   const setLocalAvailability = (pc: RTCPeerConnection) => {
+    const peerConnection = pcRef.current;
+    if (!peerConnection) {
+      return;
+    }
     //? This sets the tracks on the local device, should before anything else i think
-    const tracks = [
-      pc.addTransceiver('video', {
-        direction: 'recvonly',
-        // codecs: ['H264'],
-      }).receiver.track,
-      pc.addTransceiver('audio', {
-        direction: 'recvonly',
-      }).receiver.track,
-    ];
+    pc.addTransceiver('video', {
+      direction: 'recvonly',
+      // codecs: ['H264'],
+    }).receiver.track;
 
-    setLocalStream(new MediaStream(tracks));
+    pc.addTransceiver('audio', {
+      direction: 'recvonly',
+    }).receiver.track;
+
+    peerConnection.ontrack = (event: any) => {
+      event?.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
+        remoteStream.addTrack(track);
+      });
+    };
+
+    peerConnection.onaddstream = (event: any) => {
+      setRemoteStream(event?.stream);
+    };
   };
 
   const onIceCandidate = (ev: any) => {
     if (ev.candidate === null) {
-      // Gathering is complete?
+      //*** Gathering is complete?
+      //? I think this is where we want to notify the component that we're finished added ice candidates and can set the remote stream?
     }
     //? This is where we send the new icecandidate info to the server
     if (!ev.candidate) {
@@ -102,8 +102,8 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
   };
 
   //? WS Handlers
-
   const onWsMessage = async (ev: any) => {
+    const peerConnection = pcRef.current;
     if (!peerConnection) {
       console.error('NO PEER CONNECTION onWsMessage()');
       return;
@@ -114,9 +114,7 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     if (msg.type === 'webrtc/candidate') {
       pc.addIceCandidate(msg.value);
     } else if (msg.type === 'webrtc/answer') {
-      if (!isConnected) {
-        pc.setRemoteDescription({type: 'answer', sdp: msg.value});
-      }
+      pc.setRemoteDescription({type: 'answer', sdp: msg.value});
     }
   };
 
@@ -128,41 +126,23 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
   };
 
   const setupListeners = () => {
-    if (!peerConnection) {
-      throw 'No RTCPeerConnection found in setupListeners()';
-    }
+    pcRef.current = new RTCPeerConnection(webRTCconfig);
+
+    const peerConnection = pcRef.current;
     const ws = wsRef.current;
 
     setLocalAvailability(peerConnection);
 
-    peerConnection.addEventListener('iceconnectionstatechange', onIceConnect);
-    peerConnection.addEventListener('track', onTrack);
-    peerConnection.addEventListener('icecandidate', onIceCandidate);
+    peerConnection.oniceconnectionstatechange = _event => onIceConnect();
+    peerConnection.onicecandidate = event => onIceCandidate(event);
 
-    ws.addEventListener('open', onWsOpen);
-    ws.addEventListener('close', onWsClose);
-    ws.addEventListener('message', onWsMessage);
-  };
-
-  const cleanupListeners = () => {
-    if (!peerConnection) {
-      throw 'No RTCPeerConnection found in cleaupListeners()';
-    }
-    const ws = wsRef.current;
-
-    peerConnection.removeEventListener(
-      'iceconnectionstatechange',
-      onIceConnect,
-    );
-    peerConnection.removeEventListener('track', onTrack);
-    peerConnection.removeEventListener('icecandidate', onIceCandidate);
-
-    ws.removeEventListener('open', onWsOpen);
-    ws.removeEventListener('close', onWsClose);
-    ws.removeEventListener('message', onWsMessage);
+    ws.onopen = onWsOpen;
+    ws.onclose = onWsClose;
+    ws.onmessage = onWsMessage;
   };
 
   const connect = async () => {
+    const peerConnection = pcRef.current;
     if (!peerConnection) {
       throw 'No RTCPeerConnection found in connect()';
     }
@@ -210,11 +190,8 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     setupListeners();
     setRetryAttempts(0);
     return () => {
-      cleanupListeners();
       remoteStream?.getTracks().forEach(t => t.stop());
       remoteStream?.release(true);
-      localStream?.getTracks().forEach(t => t.stop());
-      localStream?.release();
     };
   }, []);
 
