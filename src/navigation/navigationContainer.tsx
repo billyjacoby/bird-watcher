@@ -1,6 +1,7 @@
 import {useColorScheme} from 'react-native';
 
 import CameraIcon from '@assets/icons/camera.svg';
+import VideoIcon from '@assets/icons/video-waveform.svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
@@ -46,9 +47,18 @@ const TabNavigator = () => {
                 fillSecondary={isDarkMode ? 'black' : 'white'}
               />
             );
-          } else if (route.name === 'Live') {
-            return null;
           }
+          if (route.name === 'Live') {
+            return (
+              <VideoIcon
+                height={size}
+                width={size}
+                fill={color}
+                fillSecondary={isDarkMode ? 'black' : 'white'}
+              />
+            );
+          }
+          return null;
         },
         tabBarActiveTintColor: isDarkMode ? 'white' : 'black',
         tabBarInactiveTintColor: 'gray',

@@ -1,7 +1,5 @@
 import React from 'react';
-import {useWindowDimensions, View} from 'react-native';
-
-import {ImageZoom} from '@likashefqet/react-native-image-zoom';
+import {Image, useWindowDimensions, View} from 'react-native';
 
 import {Label} from './Label';
 import {BaseText, BaseView} from '@components';
@@ -33,11 +31,11 @@ export const CameraEvent = ({camEvent}: {camEvent: FrigateEvent}) => {
     <BaseView className="px-2:" style={{width, minHeight: imageHeight}}>
       {(lastEventImage || lastThumbnail) && (
         <View className="self-center my-2 border border-accent dark:border-accent-dark relative rounded-lg">
-          <ImageZoom
+          <Image
             source={{uri: lastEventImage ?? lastThumbnail}}
             resizeMode="contain"
             style={{height: imageHeight, width: imageWidth, borderRadius: 8}}
-            className="justify-between absolute top-0"
+            className="top-0"
           />
           <View
             className="justify-between flex-row absolute p-1"
