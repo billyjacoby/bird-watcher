@@ -1,7 +1,8 @@
 import {useColorScheme} from 'react-native';
 
-import CameraIcon from '@assets/icons/camera.svg';
-import VideoIcon from '@assets/icons/video-waveform.svg';
+import EventIcon from '@icons/event.svg';
+import HomeIcon from '@icons/home.svg';
+import VideoIcon from '@icons/video-waveform.svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
@@ -9,7 +10,13 @@ import {
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import {CamerasScreen, HomeScreen, OnBoardingScreen} from '@screens';
+import {
+  EventsScreen,
+  HomeScreen,
+  LiveViewScreen,
+  OnBoardingScreen,
+} from '@screens';
+import {useAppDataStore} from '@stores';
 
 //? Can't figure out how to properly type this
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -17,6 +24,7 @@ import {CamerasScreen, HomeScreen, OnBoardingScreen} from '@screens';
 import {colors, hslFunction} from '../../themeColors.js';
 
 export type MainStackParamList = {
+  Home: undefined;
   Tabs: NavigatorScreenParams<TabsStackParamList>;
   Onboarding: undefined;
 };
@@ -24,8 +32,9 @@ export type MainStackParamList = {
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export type TabsStackParamList = {
-  Cameras: undefined;
+  Events: undefined;
   Live: undefined;
+  Recordings: undefined;
 };
 
 const TabStack = createBottomTabNavigator<TabsStackParamList>();
@@ -36,15 +45,27 @@ const TabNavigator = () => {
   return (
     <TabStack.Navigator
       screenOptions={({route}) => ({
+        headerTitle: '',
         // eslint-disable-next-line react/no-unstable-nested-components
         tabBarIcon: ({color, size}) => {
-          if (route.name === 'Cameras') {
+          if (route.name === 'Recordings') {
+            // TODO
             return (
-              <CameraIcon
+              <HomeIcon
                 height={size}
                 width={size}
                 fill={color}
-                fillSecondary={isDarkMode ? 'black' : 'white'}
+                fillSecondary={color}
+              />
+            );
+          }
+          if (route.name === 'Events') {
+            return (
+              <EventIcon
+                height={size}
+                width={size}
+                fill={color}
+                fillSecondary={color}
               />
             );
           }
@@ -70,20 +91,46 @@ const TabNavigator = () => {
         },
         header: () => null,
       })}>
-      <TabStack.Screen name="Cameras" component={CamerasScreen} />
-      <TabStack.Screen name="Live" component={HomeScreen} />
+      <TabStack.Screen name="Events" component={EventsScreen} />
+      <TabStack.Screen name="Live" component={LiveViewScreen} />
     </TabStack.Navigator>
   );
 };
 
 export const NavigationWrapper = () => {
+  const currentCamera = useAppDataStore(state => state.currentCamera);
+  const isDarkMode = useColorScheme() === 'dark';
+
+  // TODO: update to get this value properly...
+  const tintColor = isDarkMode ? 'white' : 'black';
+
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          header: () => null,
+          headerStyle: {backgroundColor: 'transparent'},
+          headerTintColor: tintColor,
         }}>
-        <Stack.Screen name="Tabs" component={TabNavigator} />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            headerBackTitle: 'Back',
+            headerTitle: 'Bird Watcher - Frigate',
+            headerTintColor: isDarkMode
+              ? colors.dark.accent
+              : colors.light.accent,
+          }}
+        />
+        <Stack.Screen
+          name="Tabs"
+          component={TabNavigator}
+          options={{
+            headerBackTitle: 'Home',
+            headerTitle: currentCamera?.replaceAll('_', ' '),
+            headerTintColor: tintColor,
+          }}
+        />
         <Stack.Screen name="Onboarding" component={OnBoardingScreen} />
       </Stack.Navigator>
     </NavigationContainer>

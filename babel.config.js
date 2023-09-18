@@ -21,9 +21,11 @@ module.exports = {
       {
         root: ['.'],
         alias: {
+          '@api': './src/lib/api',
           '@assets': './src/assets',
           '@components': './src/components',
           '@hooks': './src/hooks',
+          '@icons': './src/assets/icons',
           '@lib': './src/lib',
           '@navigation': './src/navigation',
           '@screens': './src/screens',

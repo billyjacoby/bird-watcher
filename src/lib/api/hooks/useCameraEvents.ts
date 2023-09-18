@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 
 import {API_BASE} from '@env';
 
@@ -94,9 +94,16 @@ const fetchEvents = async (
   }
 };
 
-export const useCameraEvents = (params: CameraEventParams) => {
+export const useCameraEvents = (
+  params: CameraEventParams,
+  options?: Omit<
+    UseQueryOptions<unknown, unknown, FrigateEvent[], any>,
+    'queryFn'
+  >,
+) => {
   return useQuery({
     queryFn: () => fetchEvents(params),
     queryKey: ['EVENTS', params],
+    ...options,
   });
 };

@@ -10,7 +10,12 @@
  */
 
 import React from 'react';
-import {ActivityIndicator, Text, TouchableOpacity} from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 
 import {
   MediaStream,
@@ -19,6 +24,7 @@ import {
   RTCView,
 } from 'react-native-webrtc';
 
+import {PanView} from './PanView';
 import {BaseText, BaseView} from '@components';
 import {API_BASE} from '@env';
 
@@ -49,6 +55,8 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
   const pcRef = React.useRef<RTCPeerConnection | null>(null);
   const wsRef = React.useRef<WebSocket>(new WebSocket(cameraURL));
 
+  const [isImageZoomed, setIsImageZoomed] = React.useState(false);
+
   const onIceConnect = () => {
     const peerConnection = pcRef.current;
     if (peerConnection?.iceConnectionState === 'connected') {
@@ -65,7 +73,6 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
     //? This sets the tracks on the local device, should before anything else i think
     pc.addTransceiver('video', {
       direction: 'recvonly',
-      // codecs: ['H264'],
     }).receiver.track;
 
     pc.addTransceiver('audio', {
@@ -240,12 +247,19 @@ export const WebRTCView = ({cameraName}: WebRTCViewProps) => {
   }
 
   if (remoteStream) {
+    const imageDimension = isImageZoomed ? 1000 : '100%';
+
+    // TODO: clean this up and make the zooming and panning a bit cleaner
     return (
-      <RTCView
-        className="w-full h-full"
-        objectFit={'contain'}
-        streamURL={remoteStream.toURL()}
-      />
+      <PanView isImageZoomed={isImageZoomed}>
+        <Pressable onLongPress={() => setIsImageZoomed(prev => !prev)}>
+          <RTCView
+            style={{height: imageDimension, width: imageDimension}}
+            objectFit={'contain'}
+            streamURL={remoteStream.toURL()}
+          />
+        </Pressable>
+      </PanView>
     );
   }
   return <Text>No video stream set</Text>;

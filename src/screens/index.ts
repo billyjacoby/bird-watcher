@@ -1,3 +1,5 @@
-export * from './homeScreen';
+export * from './HomeScreen';
+export * from './LiveViewScreen';
+export * from './EventsScreen';
+//
 export * from './onboardingScreen';
-export * from './CameraScreen';

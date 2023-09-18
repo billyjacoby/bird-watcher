@@ -4,6 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@assets": ["src/assets"],
+      "@icons": ["src/assets/icons"],
+      "@api": ["src/lib/api"],
       "@components": ["src/components"],
       "@hooks": ["src/hooks"],
       "@lib": ["src/lib"],

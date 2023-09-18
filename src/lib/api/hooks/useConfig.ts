@@ -2,7 +2,7 @@ import {useQuery, UseQueryOptions} from 'react-query';
 
 import {API_BASE} from '@env';
 
-import {FrigateConfig} from './types/config';
+import {FrigateConfig} from '../types/config';
 
 const URL = `${API_BASE}api/config`;
 const fetchConfig = async () => {
