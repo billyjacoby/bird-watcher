@@ -139,7 +139,8 @@ export const NavigationWrapper = () => {
                   onPress={() => {
                     nav.navigate('Birdseye');
                   }}
-                  color="#000"
+                  fill={tintColor}
+                  fillSecondary={tintColor}
                 />
               );
             },
