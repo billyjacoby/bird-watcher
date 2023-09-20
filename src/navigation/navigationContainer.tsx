@@ -1,5 +1,6 @@
 import {TouchableOpacity, useColorScheme} from 'react-native';
 
+import BirdseyeIcon from '@icons/birdseye.svg';
 import EventIcon from '@icons/event.svg';
 import HomeIcon from '@icons/home.svg';
 import SettingsIcon from '@icons/settings.svg';
@@ -12,7 +13,9 @@ import {
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+import {useConfig} from '@api';
 import {
+  BirdseyeScreen,
   EventsScreen,
   HomeScreen,
   LiveViewScreen,
@@ -26,6 +29,7 @@ import {colors} from '../../themeColors.js';
 
 export type MainStackParamList = {
   Home: undefined;
+  Birdseye: undefined;
   Tabs: NavigatorScreenParams<TabsStackParamList>;
   Settings: undefined;
   Onboarding: undefined;
@@ -43,6 +47,7 @@ const TabStack = createBottomTabNavigator<TabsStackParamList>();
 
 const TabNavigator = () => {
   const isDarkMode = useColorScheme() === 'dark';
+
   return (
     <TabStack.Navigator
       screenOptions={({route}) => ({
@@ -98,6 +103,30 @@ const TabNavigator = () => {
   );
 };
 
+const LeftHeaderButton = ({tintColor}: {tintColor?: string}) => {
+  const nav = useNavigation();
+  const config = useConfig();
+
+  if (!config.data?.birdseye.enabled) {
+    return null;
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        nav.navigate('Birdseye');
+      }}>
+      <BirdseyeIcon
+        height={24}
+        width={24}
+        fill={tintColor}
+        fillSecondary={tintColor}
+        style={{marginTop: 2}}
+      />
+    </TouchableOpacity>
+  );
+};
+
 const RightHeaderButton = ({tintColor}: {tintColor?: string}) => {
   const navigation = useNavigation();
 
@@ -134,6 +163,7 @@ export const RootNavigation = () => {
           options={{
             headerBackTitle: 'Back',
             headerTitle: 'Bird Watcher - Frigate',
+            headerLeft: props => LeftHeaderButton(props as {tintColor: string}),
             headerRight: props =>
               RightHeaderButton(props as {tintColor: string}),
             headerTintColor: isDarkMode
@@ -156,6 +186,13 @@ export const RootNavigation = () => {
           options={{presentation: 'modal', headerTransparent: false}}
         />
         <Stack.Screen name="Onboarding" component={OnBoardingScreen} />
+        <Stack.Screen
+          name="Birdseye"
+          component={BirdseyeScreen}
+          options={{
+            headerBackTitle: 'Home',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
