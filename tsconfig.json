@@ -11,7 +11,8 @@
       "@lib": ["src/lib"],
       "@navigation": ["src/navigation"],
       "@screens": ["src/screens"],
-      "@stores": ["src/stores"]
+      "@stores": ["src/stores"],
+      "@utils": ["src/utils"]
     },
     "resolveJsonModule": true,
     "allowJs": false,
@@ -19,5 +20,5 @@
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true
   },
-  "include": ["./src", "./types", "./types/index.d.ts", "./themeColors.js"]
+  "include": ["./src", "./types", "./types/index.d.ts", "themeColors.ts"]
 }

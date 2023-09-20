@@ -9,6 +9,7 @@ const internalPaths = [
   '@navigation',
   '@screens',
   '@stores',
+  '@utils',
 ];
 
 module.exports = {

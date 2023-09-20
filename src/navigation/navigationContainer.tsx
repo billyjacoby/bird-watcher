@@ -1,34 +1,37 @@
-import {useColorScheme} from 'react-native';
+import {TouchableOpacity, useColorScheme} from 'react-native';
 
+import BirdseyeIcon from '@icons/birdseye.svg';
 import EventIcon from '@icons/event.svg';
 import HomeIcon from '@icons/home.svg';
+import SettingsIcon from '@icons/settings.svg';
 import VideoIcon from '@icons/video-waveform.svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
   NavigatorScreenParams,
+  useNavigation,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import {BirdseyeNavigationButton} from '@navigation';
+import {useConfig} from '@api';
 import {
   BirdseyeScreen,
   EventsScreen,
   HomeScreen,
   LiveViewScreen,
   OnBoardingScreen,
+  SettingsScreen,
 } from '@screens';
 import {useAppDataStore} from '@stores';
+import {hslToHex} from '@utils';
 
-//? Can't figure out how to properly type this
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-import {colors, hslFunction} from '../../themeColors.js';
+import {colors} from '../../themeColors.js';
 
 export type MainStackParamList = {
   Home: undefined;
   Birdseye: undefined;
   Tabs: NavigatorScreenParams<TabsStackParamList>;
+  Settings: undefined;
   Onboarding: undefined;
 };
 
@@ -45,7 +48,6 @@ const TabStack = createBottomTabNavigator<TabsStackParamList>();
 const TabNavigator = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
-  //TODO: make work with tailwind theme...
   return (
     <TabStack.Navigator
       screenOptions={({route}) => ({
@@ -90,8 +92,8 @@ const TabNavigator = () => {
         tabBarStyle: {
           borderTopWidth: 0,
           backgroundColor: isDarkMode
-            ? hslFunction(colors.dark.background)
-            : hslFunction(colors.light.background),
+            ? hslToHex(colors.dark.background)
+            : hslToHex(colors.light.background),
         },
         header: () => null,
       })}>
@@ -101,18 +103,57 @@ const TabNavigator = () => {
   );
 };
 
-export const NavigationWrapper = () => {
+const LeftHeaderButton = ({tintColor}: {tintColor?: string}) => {
+  const nav = useNavigation();
+  const config = useConfig();
+
+  if (!config.data?.birdseye.enabled) {
+    return null;
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        nav.navigate('Birdseye');
+      }}>
+      <BirdseyeIcon
+        height={25}
+        width={25}
+        fill={tintColor}
+        fillSecondary={tintColor}
+      />
+    </TouchableOpacity>
+  );
+};
+
+const RightHeaderButton = ({tintColor}: {tintColor?: string}) => {
+  const navigation = useNavigation();
+
+  return (
+    <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+      <SettingsIcon height={22} width={22} fill={tintColor} />
+    </TouchableOpacity>
+  );
+};
+
+export const RootNavigation = () => {
   const currentCamera = useAppDataStore(state => state.currentCamera);
   const isDarkMode = useColorScheme() === 'dark';
 
-  // TODO: update to get this value properly...
-  const tintColor = isDarkMode ? 'white' : 'black';
+  const tintColor = isDarkMode
+    ? hslToHex(colors.dark.foreground)
+    : hslToHex(colors.light.foreground);
+
+  const backgroundColor = isDarkMode
+    ? hslToHex(colors.dark.background)
+    : hslToHex(colors.light.background);
 
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerStyle: {backgroundColor: 'transparent'},
+          headerStyle: {backgroundColor: backgroundColor},
+          headerShadowVisible: false,
           headerTintColor: tintColor,
         }}>
         <Stack.Screen
@@ -121,10 +162,12 @@ export const NavigationWrapper = () => {
           options={{
             headerBackTitle: 'Back',
             headerTitle: 'Bird Watcher - Frigate',
-            headerLeft: () => <BirdseyeNavigationButton fill={tintColor} />,
+            headerLeft: props => LeftHeaderButton(props as {tintColor: string}),
+            headerRight: props =>
+              RightHeaderButton(props as {tintColor: string}),
             headerTintColor: isDarkMode
-              ? colors.dark.accent
-              : colors.light.accent,
+              ? hslToHex(colors.dark.foreground)
+              : hslToHex(colors.light.foreground),
           }}
         />
         <Stack.Screen
@@ -135,6 +178,11 @@ export const NavigationWrapper = () => {
             headerTitle: currentCamera?.replaceAll('_', ' '),
             headerTintColor: tintColor,
           }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{presentation: 'modal', headerTransparent: false}}
         />
         <Stack.Screen name="Onboarding" component={OnBoardingScreen} />
         <Stack.Screen
