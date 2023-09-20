@@ -117,8 +117,8 @@ const LeftHeaderButton = ({tintColor}: {tintColor?: string}) => {
         nav.navigate('Birdseye');
       }}>
       <BirdseyeIcon
-        height={25}
-        width={25}
+        height={24}
+        width={24}
         fill={tintColor}
         fillSecondary={tintColor}
       />
