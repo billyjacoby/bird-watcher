@@ -1,4 +1,4 @@
-export * from './HomeScreen';
+export * from './homeScreen';
 export * from './LiveViewScreen';
 export * from './EventsScreen';
 //

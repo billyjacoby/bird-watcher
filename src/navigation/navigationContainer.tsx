@@ -1,23 +1,22 @@
-import {Button, useColorScheme} from 'react-native';
+import {useColorScheme} from 'react-native';
 
 import EventIcon from '@icons/event.svg';
 import HomeIcon from '@icons/home.svg';
 import VideoIcon from '@icons/video-waveform.svg';
-import BirdseyeIcon from '@icons/birdseye.svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
   NavigatorScreenParams,
-  useNavigation,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+import {BirdseyeNavigationButton} from '@navigation';
 import {
+  BirdseyeScreen,
   EventsScreen,
   HomeScreen,
   LiveViewScreen,
   OnBoardingScreen,
-  BirdseyeScreen,
 } from '@screens';
 import {useAppDataStore} from '@stores';
 
@@ -25,7 +24,6 @@ import {useAppDataStore} from '@stores';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 import {colors, hslFunction} from '../../themeColors.js';
-import {useConfig} from '@api';
 
 export type MainStackParamList = {
   Home: undefined;
@@ -104,8 +102,6 @@ const TabNavigator = () => {
 };
 
 export const NavigationWrapper = () => {
-  const config = useConfig();
-
   const currentCamera = useAppDataStore(state => state.currentCamera);
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -125,25 +121,7 @@ export const NavigationWrapper = () => {
           options={{
             headerBackTitle: 'Back',
             headerTitle: 'Bird Watcher - Frigate',
-            headerLeft: () => {
-              const nav = useNavigation();
-
-              if (!config.data?.birdseye.enabled) {
-                return null;
-              }
-
-              return (
-                <BirdseyeIcon
-                  height={25}
-                  width={25}
-                  onPress={() => {
-                    nav.navigate('Birdseye');
-                  }}
-                  fill={tintColor}
-                  fillSecondary={tintColor}
-                />
-              );
-            },
+            headerLeft: () => <BirdseyeNavigationButton fill={tintColor} />,
             headerTintColor: isDarkMode
               ? colors.dark.accent
               : colors.light.accent,
