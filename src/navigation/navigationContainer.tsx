@@ -1,12 +1,14 @@
-import {useColorScheme} from 'react-native';
+import {TouchableOpacity, useColorScheme} from 'react-native';
 
 import EventIcon from '@icons/event.svg';
 import HomeIcon from '@icons/home.svg';
+import SettingsIcon from '@icons/settings.svg';
 import VideoIcon from '@icons/video-waveform.svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   NavigationContainer,
   NavigatorScreenParams,
+  useNavigation,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -15,6 +17,7 @@ import {
   HomeScreen,
   LiveViewScreen,
   OnBoardingScreen,
+  SettingsScreen,
 } from '@screens';
 import {useAppDataStore} from '@stores';
 import {hslToHex} from '@utils';
@@ -24,6 +27,7 @@ import {colors} from '../../themeColors.js';
 export type MainStackParamList = {
   Home: undefined;
   Tabs: NavigatorScreenParams<TabsStackParamList>;
+  Settings: undefined;
   Onboarding: undefined;
 };
 
@@ -94,7 +98,17 @@ const TabNavigator = () => {
   );
 };
 
-export const NavigationWrapper = () => {
+const RightHeaderButton = ({tintColor}: {tintColor?: string}) => {
+  const navigation = useNavigation();
+
+  return (
+    <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+      <SettingsIcon height={22} width={22} fill={tintColor} />
+    </TouchableOpacity>
+  );
+};
+
+export const RootNavigation = () => {
   const currentCamera = useAppDataStore(state => state.currentCamera);
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -102,11 +116,16 @@ export const NavigationWrapper = () => {
     ? hslToHex(colors.dark.foreground)
     : hslToHex(colors.light.foreground);
 
+  const backgroundColor = isDarkMode
+    ? hslToHex(colors.dark.background)
+    : hslToHex(colors.light.background);
+
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerStyle: {backgroundColor: 'transparent'},
+          headerStyle: {backgroundColor: backgroundColor},
+          headerShadowVisible: false,
           headerTintColor: tintColor,
         }}>
         <Stack.Screen
@@ -115,6 +134,8 @@ export const NavigationWrapper = () => {
           options={{
             headerBackTitle: 'Back',
             headerTitle: 'Bird Watcher - Frigate',
+            headerRight: props =>
+              RightHeaderButton(props as {tintColor: string}),
             headerTintColor: isDarkMode
               ? hslToHex(colors.dark.foreground)
               : hslToHex(colors.light.foreground),
@@ -128,6 +149,11 @@ export const NavigationWrapper = () => {
             headerTitle: currentCamera?.replaceAll('_', ' '),
             headerTintColor: tintColor,
           }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{presentation: 'modal', headerTransparent: false}}
         />
         <Stack.Screen name="Onboarding" component={OnBoardingScreen} />
       </Stack.Navigator>

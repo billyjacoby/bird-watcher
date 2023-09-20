@@ -4,7 +4,7 @@ import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 import clsx from 'clsx';
 import {QueryClient, QueryClientProvider} from 'react-query';
 
-import {NavigationWrapper} from '@navigation';
+import {RootNavigation} from '@navigation';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -16,7 +16,7 @@ function App(): JSX.Element {
       className={clsx('flex-1', 'bg-background', 'dark:bg-background-dark')}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <QueryClientProvider client={queryClient}>
-        <NavigationWrapper />
+        <RootNavigation />
       </QueryClientProvider>
     </SafeAreaView>
   );
