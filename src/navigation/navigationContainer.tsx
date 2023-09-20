@@ -121,6 +121,7 @@ const LeftHeaderButton = ({tintColor}: {tintColor?: string}) => {
         width={24}
         fill={tintColor}
         fillSecondary={tintColor}
+        style={{marginTop: 2}}
       />
     </TouchableOpacity>
   );
