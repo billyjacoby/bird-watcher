@@ -17,11 +17,9 @@ import {
   OnBoardingScreen,
 } from '@screens';
 import {useAppDataStore} from '@stores';
+import {hslToHex} from '@utils';
 
-//? Can't figure out how to properly type this
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-import {colors, hslFunction} from '../../themeColors.js';
+import {colors} from '../../themeColors.js';
 
 export type MainStackParamList = {
   Home: undefined;
@@ -41,7 +39,6 @@ const TabStack = createBottomTabNavigator<TabsStackParamList>();
 
 const TabNavigator = () => {
   const isDarkMode = useColorScheme() === 'dark';
-  //TODO: make work with tailwind theme...
   return (
     <TabStack.Navigator
       screenOptions={({route}) => ({
@@ -86,8 +83,8 @@ const TabNavigator = () => {
         tabBarStyle: {
           borderTopWidth: 0,
           backgroundColor: isDarkMode
-            ? hslFunction(colors.dark.background)
-            : hslFunction(colors.light.background),
+            ? hslToHex(colors.dark.background)
+            : hslToHex(colors.light.background),
         },
         header: () => null,
       })}>
@@ -101,8 +98,9 @@ export const NavigationWrapper = () => {
   const currentCamera = useAppDataStore(state => state.currentCamera);
   const isDarkMode = useColorScheme() === 'dark';
 
-  // TODO: update to get this value properly...
-  const tintColor = isDarkMode ? 'white' : 'black';
+  const tintColor = isDarkMode
+    ? hslToHex(colors.dark.foreground)
+    : hslToHex(colors.light.foreground);
 
   return (
     <NavigationContainer>
@@ -118,8 +116,8 @@ export const NavigationWrapper = () => {
             headerBackTitle: 'Back',
             headerTitle: 'Bird Watcher - Frigate',
             headerTintColor: isDarkMode
-              ? colors.dark.accent
-              : colors.light.accent,
+              ? hslToHex(colors.dark.foreground)
+              : hslToHex(colors.light.foreground),
           }}
         />
         <Stack.Screen
