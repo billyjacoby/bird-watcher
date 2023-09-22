@@ -191,6 +191,7 @@ export const RootNavigation = () => {
           component={BirdseyeScreen}
           options={{
             headerBackTitle: 'Home',
+            presentation: 'modal',
           }}
         />
       </Stack.Navigator>
