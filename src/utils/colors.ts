@@ -17,3 +17,5 @@ export const hslToHex = (HSL: string) => {
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 };
+
+export const bgBackground = 'bg-background dark:bg-background-dark';

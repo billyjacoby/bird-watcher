@@ -2,6 +2,8 @@ import {ScrollView, ScrollViewProps, View, ViewProps} from 'react-native';
 
 import clsx from 'clsx';
 
+import {bgBackground} from '@utils';
+
 type BaseViewProps =
   | ({isScrollview?: never} & ViewProps)
   | ({isScrollview: true} & ScrollViewProps);
@@ -11,16 +13,11 @@ export const BaseView = (props: BaseViewProps) => {
     return (
       <ScrollView
         contentContainerStyle={{minHeight: '95%'}}
-        className={clsx('bg-background', 'dark:bg-background-dark', 'flex-1')}
+        className={clsx(bgBackground, 'flex-1')}
         {...props}
       />
     );
   } else {
-    return (
-      <View
-        className={clsx('bg-background', 'dark:bg-background-dark')}
-        {...props}
-      />
-    );
+    return <View className={bgBackground} {...props} />;
   }
 };
