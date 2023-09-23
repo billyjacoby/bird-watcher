@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios --simulator='iPhone 14'",
+    "ios": "react-native run-ios --simulator='iPhone 15'",
+    "archive": "xcodebuild -workspace ios/BirdWatcher.xcworkspace -configuration Debug -scheme BirdWatcher archive",
     "pod": "cd ios && pod install && cd ../",
     "format": "eslint . --fix",
     "lint": "eslint . --quiet",
