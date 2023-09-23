@@ -18,7 +18,7 @@ export const SnapshotCard = ({
   const imageHeight = imageWidth * 0.75;
 
   return (
-    <View className="self-center my-2 border border-accent dark:border-accent-dark relative rounded-lg">
+    <View className="self-center border border-accent dark:border-accent-dark relative rounded-lg">
       <Image
         source={{uri: imageSource}}
         resizeMode="contain"

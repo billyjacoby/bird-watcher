@@ -1,9 +1,21 @@
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, FlatList, View} from 'react-native';
+
+import clsx from 'clsx';
 
 import {CameraEvent} from './components';
 import {useCameraEvents} from '@api';
 import {BaseText, BaseView} from '@components';
 import {useAppDataStore} from '@stores';
+import {bgBackground} from '@utils';
+
+const FooterComponent = ({length}: {length: number}) => (
+  //? I don't know why but we get some layout shift and that requires adding this height value here
+  <BaseView className="h-[250]">
+    <BaseText className="text-center text-mutedForeground dark:text-mutedForeground-dark pt-2">
+      Showing {length} event{length > 1 && 's'}.
+    </BaseText>
+  </BaseView>
+);
 
 export const EventsScreen = () => {
   const currentCamera = useAppDataStore(state => state.currentCamera);
@@ -46,14 +58,17 @@ export const EventsScreen = () => {
   }
 
   return (
-    <BaseView isScrollview showsVerticalScrollIndicator={false}>
-      {events.map(camEvent => {
-        return <CameraEvent camEvent={camEvent} key={camEvent.id} />;
-      })}
+    <View className="flex-1">
+      <FlatList
+        className={clsx(bgBackground)}
+        ListFooterComponent={<FooterComponent length={events.length} />}
+        showsVerticalScrollIndicator={false}
+        data={events}
+        renderItem={({item: camEvent}) => (
+          <CameraEvent camEvent={camEvent} key={camEvent.id} />
+        )}
+      />
       {/* // TODO: Get total event info and group by date. Add pagination heree */}
-      <BaseText className="text-center text-mutedForeground dark:text-mutedForeground-dark">
-        Showing {events.length} event{events.length > 1 && 's'}.
-      </BaseText>
-    </BaseView>
+    </View>
   );
 };

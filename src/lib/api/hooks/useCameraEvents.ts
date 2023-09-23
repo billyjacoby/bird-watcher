@@ -2,50 +2,13 @@ import {useQuery, UseQueryOptions} from 'react-query';
 
 import {API_BASE} from '@env';
 
+import {
+  CameraEventParams,
+  FrigateEvent,
+  SnapshotQueryParams,
+} from '../types/events';
+
 const URL = `${API_BASE}api/events`;
-
-export interface FrigateEvent {
-  //? Unsure what the non null types should be here
-  area: null | any;
-  box: null | any;
-  plus_id: null | any;
-  false_positive: null | any;
-  ratio: null | any;
-  camera: string;
-  end_time: number;
-  has_clip: boolean;
-  has_snapshot: boolean;
-  id: string;
-  label: string;
-  region: null | string;
-  retain_indefinitely: boolean;
-  start_time: number;
-  sub_label: null | string;
-  thumbnail: string;
-  top_score: number;
-  snapshotURL?: string;
-}
-
-interface CameraEventParams extends Record<string, string | undefined> {
-  before?: string;
-  after?: string;
-  cameras?: string;
-  labels?: string;
-  zones?: string;
-  limit?: string;
-  has_snapshot?: string;
-  has_clip?: string;
-  include_thumbnails?: string;
-  in_progress?: string;
-}
-
-interface SnapshotQueryParams extends Record<string, string | undefined> {
-  h?: string;
-  bbox?: string;
-  timestamp?: string;
-  crop?: string;
-  quality?: string;
-}
 
 const buildSnapshotURL = (
   eventId: string,
@@ -58,6 +21,11 @@ const buildSnapshotURL = (
     url = url + '?' + params;
   }
   return url;
+};
+
+const buildEventUrl = (eventId: string) => {
+  const VOD_URL = `${API_BASE}vod/event/${eventId}/index.m3u8`;
+  return VOD_URL;
 };
 
 const fetchEvents = async (
@@ -77,11 +45,16 @@ const fetchEvents = async (
       if (data) {
         const returnData: FrigateEvent[] = [];
         for (const event of data) {
+          const enrichedEvent: FrigateEvent = {...event};
+
+          const vodURL = buildEventUrl(event.id);
+          enrichedEvent.vodURL = vodURL;
           if (event.has_snapshot) {
             const snapshotURL = buildSnapshotURL(event.id, snapShotQueryParams);
-            returnData.push({...event, snapshotURL});
+            enrichedEvent.snapshotURL = snapshotURL;
+            returnData.push(enrichedEvent);
           } else {
-            returnData.push(event);
+            returnData.push(enrichedEvent);
           }
         }
         return Promise.resolve(returnData);
