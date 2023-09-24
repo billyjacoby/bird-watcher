@@ -17,6 +17,13 @@ export const SnapshotCard = ({
   const imageWidth = width * 0.97;
   const imageHeight = imageWidth * 0.75;
 
+  // ongoing events have end date of either '1/1/70' or '01/01/1970'
+  const endDate =
+    camEvent?.lastEventEnded.startsWith('1/1/70') ||
+    camEvent?.lastEventEnded.startsWith('01/01/1970')
+      ? 'Current'
+      : camEvent?.lastEventEnded;
+
   return (
     <View className="self-center border border-accent dark:border-accent-dark relative rounded-lg">
       <Image
@@ -39,7 +46,7 @@ export const SnapshotCard = ({
           {!!camEvent.lastEventEnded && (
             <Label>
               <BaseText className="text-xs text-mutedForeground dark:text-mutedForeground-dark">
-                {camEvent.lastEventEnded}
+                {endDate}
               </BaseText>
             </Label>
           )}

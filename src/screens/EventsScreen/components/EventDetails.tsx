@@ -17,6 +17,14 @@ export const EventDetails = ({camEvent}: {camEvent: FrigateEvent}) => {
   // TODO: format minutes here too.
   const eventDuration = Math.round(camEvent.end_time - camEvent.start_time);
 
+  const endTimeValue =
+    endDate.getFullYear() === 1970
+      ? 'Current'
+      : endDate.toLocaleDateString() + ' @ ' + endDate.toLocaleTimeString();
+
+  const durationValue =
+    eventDuration < 0 ? 'Ongoing' : eventDuration + ' seconds';
+
   return (
     <BaseView className="flex-1">
       <BaseText className="self-center text-lg mb-1">Event Details</BaseText>
@@ -30,13 +38,11 @@ export const EventDetails = ({camEvent}: {camEvent: FrigateEvent}) => {
       </Row>
       <Row>
         <BaseText>End Time</BaseText>
-        <BaseText>
-          {endDate.toLocaleDateString() + ' @ ' + endDate.toLocaleTimeString()}
-        </BaseText>
+        <BaseText>{endTimeValue}</BaseText>
       </Row>
       <Row>
         <BaseText>Event Duration</BaseText>
-        <BaseText>{eventDuration} seconds</BaseText>
+        <BaseText>{durationValue}</BaseText>
       </Row>
       <Row>
         <BaseText>Object Label</BaseText>
