@@ -29,7 +29,7 @@
     "react-native-safe-area-context": "^4.7.1",
     "react-native-screens": "^3.24.0",
     "react-native-svg": "^13.13.0",
-    "react-native-video": "alpha",
+    "react-native-video": "latest",
     "react-native-webrtc": "^111.0.3",
     "react-query": "^3.39.3",
     "superjson": "^1.13.1",
