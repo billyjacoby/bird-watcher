@@ -1,6 +1,8 @@
 import {MMKV} from 'react-native-mmkv';
 import {create} from 'zustand';
-import {persist, StateStorage} from 'zustand/middleware';
+import {createJSONStorage, persist, StateStorage} from 'zustand/middleware';
+
+import {DEFAULT_EVENTS_TO_LOAD} from '@utils';
 
 const appDataStore = new MMKV({
   id: 'bird-watcher',
@@ -25,7 +27,15 @@ interface AppDataStore {
   setHasOpenedAppBefore: (b?: boolean) => void;
   currentCamera?: string;
   setCurrentCamera: (s: string) => void;
+  eventsToLoad: number;
+  setEventsToLoad: (n?: number) => void;
 }
+
+const defaultDataStore = {
+  currentCamera: undefined,
+  hasOpenedAppBefore: false,
+  eventsToLoad: DEFAULT_EVENTS_TO_LOAD,
+};
 
 export const useAppDataStore = create<
   AppDataStore,
@@ -35,13 +45,16 @@ export const useAppDataStore = create<
     set => ({
       currentCamera: undefined,
       hasOpenedAppBefore: false,
+      eventsToLoad: DEFAULT_EVENTS_TO_LOAD,
+      setEventsToLoad: (n?: number) =>
+        set({eventsToLoad: n || defaultDataStore.eventsToLoad}),
       setHasOpenedAppBefore: (b?: boolean) =>
         set({hasOpenedAppBefore: typeof b === 'undefined' ? true : b}),
       setCurrentCamera: (currentCamera: string) => set({currentCamera}),
     }),
     {
       name: 'app-storage',
-      getStorage: () => zustandStorage,
+      storage: createJSONStorage(() => zustandStorage),
       // partialize: state =>
       //   Object.fromEntries(
       //     Object.entries(state).filter(
