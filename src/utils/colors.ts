@@ -1,3 +1,5 @@
+import {colors} from '../../themeColors';
+
 export const hslToHex = (HSL: string) => {
   HSL = HSL.replaceAll('%', '');
   const [_h, _s, _l]: (string | number)[] = HSL.split(' ');
@@ -19,3 +21,9 @@ export const hslToHex = (HSL: string) => {
 };
 
 export const bgBackground = 'bg-background dark:bg-background-dark';
+export const getFgColorHex = (isDarkMode: boolean) => {
+  if (isDarkMode) {
+    return hslToHex(colors.dark.foreground);
+  }
+  return hslToHex(colors.light.foreground);
+};

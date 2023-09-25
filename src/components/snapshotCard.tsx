@@ -1,5 +1,7 @@
 import {Image, ImageURISource, useWindowDimensions, View} from 'react-native';
 
+import clsx from 'clsx';
+
 import {BaseText} from './baseText';
 import {Label} from './label';
 import {FrigateEvent} from '@api';
@@ -8,23 +10,24 @@ export const SnapshotCard = ({
   imageSource,
   camEvent,
   imageOverlay,
+  addtlClasses,
 }: {
   imageSource: ImageURISource['uri'];
   camEvent?: FrigateEvent & {lastEventEnded: string};
   imageOverlay?: React.ReactNode;
+  addtlClasses?: string;
 }) => {
   const {width} = useWindowDimensions();
-  const imageWidth = width * 0.97;
+  const imageWidth = width;
   const imageHeight = imageWidth * 0.75;
 
   return (
-    <View className="self-center border border-accent dark:border-accent-dark relative rounded-lg">
+    <View className={clsx('rounded-xl', addtlClasses)}>
       <Image
         source={{uri: imageSource}}
-        resizeMode="contain"
-        // eslint-disable-next-line react-native/no-inline-styles
-        style={{height: imageHeight, width: imageWidth, borderRadius: 8}}
-        className="top-0"
+        resizeMode="cover"
+        style={{height: imageHeight, width: imageWidth}}
+        className="top-0 rounded-lg"
       />
       {!!imageOverlay && imageOverlay}
       {!!camEvent && (
