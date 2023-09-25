@@ -36,7 +36,9 @@ export const EventDetails = ({camEvent}: {camEvent: FrigateEvent}) => {
       </Row>
       <Row>
         <BaseText>Event Duration</BaseText>
-        <BaseText>{eventDuration} seconds</BaseText>
+        <BaseText>
+          {eventDuration > 0 ? eventDuration : 'In Progress'} seconds
+        </BaseText>
       </Row>
       <Row>
         <BaseText>Object Label</BaseText>

@@ -7,11 +7,19 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
+import clsx from 'clsx';
+
 import {EventDetails} from './EventDetails';
 import {FrigateEvent} from '@api';
 import {BaseView, SnapshotCard, VideoPlayer} from '@components';
 
-export const CameraEvent = ({camEvent}: {camEvent: FrigateEvent}) => {
+export const CameraEvent = ({
+  camEvent,
+  isFirst,
+}: {
+  camEvent: FrigateEvent;
+  isFirst?: boolean;
+}) => {
   const {width} = useWindowDimensions();
   const imageWidth = width * 0.97;
   const imageHeight = imageWidth * 0.75;
@@ -44,9 +52,7 @@ export const CameraEvent = ({camEvent}: {camEvent: FrigateEvent}) => {
       if (scrollIndex === 2) {
         setVideoIsPaused(false);
       } else {
-        if (videoIsPaused === false) {
-          setVideoIsPaused(true);
-        }
+        setVideoIsPaused(true);
       }
     }
   };
@@ -64,8 +70,7 @@ export const CameraEvent = ({camEvent}: {camEvent: FrigateEvent}) => {
       contentOffset={{x: width, y: 0}}
       showsHorizontalScrollIndicator={false}
       pagingEnabled
-      style={{flex: 1}}
-      className="py-2">
+      className={clsx('py-2', isFirst && 'pt-1 rounded-t-none')}>
       {/* //? Details on left */}
       <BaseView
         style={{width, height: imageHeight}}
@@ -86,11 +91,15 @@ export const CameraEvent = ({camEvent}: {camEvent: FrigateEvent}) => {
       </BaseView>
 
       {/* //? if there's a video, show that to the right */}
-      {camEvent.has_clip && (
-        <BaseView style={{width, height: imageHeight}} className="py-2">
-          <VideoPlayer videoURI={camEvent.vodURL} isPaused={videoIsPaused} />
-        </BaseView>
-      )}
+      <BaseView style={{width, height: imageHeight}}>
+        <VideoPlayer
+          key={camEvent.id}
+          videoURI={camEvent.vodURL}
+          isPaused={videoIsPaused}
+          snapshotURL={lastEventImage || lastThumbnail}
+        />
+      </BaseView>
     </ScrollView>
   );
 };
+//
