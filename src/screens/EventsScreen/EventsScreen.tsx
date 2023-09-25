@@ -14,36 +14,25 @@ import {BaseText, BaseView} from '@components';
 import {useAppDataStore} from '@stores';
 import {bgBackground} from '@utils';
 
+import {EventListFooter} from './components/EventListFooter';
 import {SectionDateHeader} from './components/SectionDateHeader';
-
-const FooterComponent = ({length}: {length?: number}) => {
-  return (
-    //? I don't know why but we get some layout shift and that requires adding this height value here
-    <BaseView className="">
-      {!!length && (
-        <BaseText className="text-center text-mutedForeground dark:text-mutedForeground-dark pt-2">
-          Showing {length} event{length > 1 && 's'}.
-        </BaseText>
-      )}
-    </BaseView>
-  );
-};
 
 export const EventsScreen = () => {
   const currentCamera = useAppDataStore(state => state.currentCamera);
-  const {
-    data: events,
-    isLoading,
-    error,
-  } = useCameraEvents(
+  const limit = useAppDataStore(state => state.eventsToLoad);
+  const {data, isLoading, error, fetchNextPage, hasNextPage} = useCameraEvents(
     {
       cameras: currentCamera || '',
-      limit: '10',
+      limit: limit.toString(),
     },
     {enabled: !!currentCamera},
   );
 
   const [collapsedSections, setCollapsedSections] = React.useState(new Set());
+
+  const events = data?.pages.reduce<FrigateEvent[]>((acc, curr) => {
+    return acc.concat(curr.events).flat(1);
+  }, []);
 
   //? PERF: I could see this getting real expensive with more events. Consider moving into a RQ Select function?
   const groupedEvents = React.useMemo(
@@ -105,7 +94,12 @@ export const EventsScreen = () => {
         className={clsx(bgBackground)}
         extraData={collapsedSections}
         keyExtractor={(item, index) => item.id + index}
-        ListFooterComponent={<FooterComponent length={events?.length} />}
+        ListFooterComponent={
+          <EventListFooter
+            length={events?.length}
+            fetchNextPage={hasNextPage ? fetchNextPage : undefined}
+          />
+        }
         showsVerticalScrollIndicator={false}
         sections={groupedEvents}
         renderSectionHeader={props => (

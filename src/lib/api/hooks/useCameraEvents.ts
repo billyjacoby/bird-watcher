@@ -1,6 +1,7 @@
-import {useQuery, UseQueryOptions} from 'react-query';
+import {useInfiniteQuery, UseInfiniteQueryOptions} from 'react-query';
 
 import {API_BASE} from '@env';
+import {DEFAULT_EVENTS_TO_LOAD} from '@utils';
 
 import {
   CameraEventParams,
@@ -29,11 +30,19 @@ const buildEventUrl = (eventId: string) => {
 };
 
 const fetchEvents = async (
+  beforeEpoch?: number,
   queryParams?: CameraEventParams,
   snapShotQueryParams?: SnapshotQueryParams,
 ) => {
   let params: URLSearchParams | undefined;
+  const limit = parseInt(
+    queryParams?.limit || DEFAULT_EVENTS_TO_LOAD.toString(),
+    10,
+  );
   if (queryParams) {
+    if (typeof queryParams.before === 'undefined' && beforeEpoch) {
+      queryParams.before = beforeEpoch?.toString();
+    }
     params = new URLSearchParams(queryParams as Record<string, string>);
   }
 
@@ -57,7 +66,17 @@ const fetchEvents = async (
             returnData.push(enrichedEvent);
           }
         }
-        return Promise.resolve(returnData);
+        let pageParam: number | undefined;
+        if (returnData?.length === limit) {
+          /**
+           * ! There's an edge case here where the number of items is divisible
+           * by the limit, which means there won't actually be a next page but we
+           * think that there is.
+           */
+
+          pageParam = returnData[limit - 1]?.start_time;
+        }
+        return Promise.resolve({events: returnData, pageParam});
       }
     } else {
       return Promise.reject(new Error('ResNotOK'));
@@ -70,13 +89,21 @@ const fetchEvents = async (
 export const useCameraEvents = (
   params: CameraEventParams,
   options?: Omit<
-    UseQueryOptions<unknown, unknown, FrigateEvent[], any>,
+    UseInfiniteQueryOptions<
+      {events: FrigateEvent[]; pageParam?: number},
+      unknown,
+      {events: FrigateEvent[]; pageParam?: number},
+      any
+    >,
     'queryFn'
   >,
 ) => {
-  return useQuery({
-    queryFn: () => fetchEvents(params),
+  return useInfiniteQuery({
+    queryFn: ({pageParam}) => fetchEvents(pageParam, params),
     queryKey: ['EVENTS', params],
+    getNextPageParam: lastPage => {
+      return lastPage?.pageParam;
+    },
     ...options,
   });
 };
