@@ -7,11 +7,13 @@ export const VideoPlayer = ({
   isPaused = true,
   snapshotURL,
   isForcedFullscreen,
+  onError,
 }: {
   videoURI: string;
   isPaused?: boolean;
   snapshotURL?: string;
   isForcedFullscreen?: boolean;
+  onError?: Video['props']['onError'];
 }) => {
   React.useEffect(() => {}, []);
   return (
@@ -24,8 +26,9 @@ export const VideoPlayer = ({
       paused={isPaused}
       pictureInPicture={true}
       controls
-      source={{uri: videoURI}}
+      source={{uri: videoURI, type: 'm3u8'}}
       fullscreen={isForcedFullscreen}
+      onError={onError || console.error}
     />
   );
 };

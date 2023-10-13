@@ -2,7 +2,7 @@ import React from 'react';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import {BaseView, VideoPlayer} from '@components';
+import {BaseText, BaseView, VideoPlayer} from '@components';
 import {MainStackParamList} from '@navigation';
 
 type FullscreenVideoProps = NativeStackScreenProps<
@@ -15,6 +15,7 @@ export const FullscreenVideoPlayer = ({
   navigation,
 }: FullscreenVideoProps) => {
   const title = route.params.title || '';
+  const [hasError, setHasError] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     navigation.setOptions({title});
@@ -22,11 +23,21 @@ export const FullscreenVideoPlayer = ({
 
   return (
     <BaseView className="flex-1">
-      <VideoPlayer
-        videoURI={route.params.videoURI}
-        isForcedFullscreen
-        isPaused={false}
-      />
+      {hasError ? (
+        <BaseText className="text-destructive dark:text-destructive-dark">
+          Error loading video.
+        </BaseText>
+      ) : (
+        <VideoPlayer
+          videoURI={route.params.videoURI}
+          isForcedFullscreen
+          isPaused={false}
+          onError={data => {
+            setHasError(true);
+            console.error(data, route.params.videoURI);
+          }}
+        />
+      )}
     </BaseView>
   );
 };

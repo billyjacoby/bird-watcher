@@ -21,7 +21,7 @@ Though this is built in React Native, the immediate focus is to build an iOS nat
 Though this project is still in the very early stages, it is maturing quickly. The items below are what is next on the roadmap for feature implementation:
 
 - [x] Event viewing
-- [ ] Recording viewing
+- [x] Recording viewing
 - [ ] View & update config
 - [ ] Local user settings
 - [ ] User onboarding
