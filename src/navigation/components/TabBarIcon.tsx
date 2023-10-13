@@ -1,7 +1,6 @@
-import EventIcon from '@icons/event.svg';
-import RecordingIcon from '@icons/recording.svg';
-import VideoIcon from '@icons/video-waveform.svg';
 import {RouteProp} from '@react-navigation/native';
+
+import {Event, Live, Recording} from '@icons';
 
 import {CameraTabsStackParamList} from '../CameraTabNavigator';
 
@@ -18,7 +17,7 @@ export const TabBarIcon = ({
 }) => {
   if (route.name === 'Recordings') {
     return (
-      <RecordingIcon
+      <Recording
         height={size}
         width={size}
         fill={color}
@@ -28,17 +27,12 @@ export const TabBarIcon = ({
   }
   if (route.name === 'Events') {
     return (
-      <EventIcon
-        height={size}
-        width={size}
-        fill={color}
-        fillSecondary={color}
-      />
+      <Event height={size} width={size} fill={color} fillSecondary={color} />
     );
   }
   if (route.name === 'Live') {
     return (
-      <VideoIcon
+      <Live
         height={size}
         width={size}
         fill={color}

@@ -1,10 +1,10 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
-import BirdseyeIcon from '@icons/birdseye.svg';
 import {useNavigation} from '@react-navigation/native';
 
 import {useConfig} from '@api';
+import {Birdseye} from '@icons';
 
 export const LeftHeaderButton = ({tintColor}: {tintColor?: string}) => {
   const nav = useNavigation();
@@ -19,7 +19,7 @@ export const LeftHeaderButton = ({tintColor}: {tintColor?: string}) => {
       onPress={() => {
         nav.navigate('Birdseye');
       }}>
-      <BirdseyeIcon
+      <Birdseye
         height={24}
         width={24}
         fill={tintColor}

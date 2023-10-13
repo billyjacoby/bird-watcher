@@ -1,10 +1,10 @@
 import React from 'react';
 import {Pressable, useColorScheme, View} from 'react-native';
 
-import DownSquare from '@icons/downSquare.svg';
 import clsx from 'clsx';
 
 import {BaseText, Label} from '@components';
+import {DownSquare} from '@icons';
 import {getFgColorHex} from '@utils';
 
 export const SectionDateHeader = ({
