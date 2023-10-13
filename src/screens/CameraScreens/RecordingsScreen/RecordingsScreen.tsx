@@ -23,7 +23,11 @@ export const RecordingsScreen = () => {
           data={data}
           renderItem={({item: recording}) => {
             const date = new Date(recording.day);
+            const tzOffsetMinutes = date.getTimezoneOffset();
+
+            date.setUTCMinutes(tzOffsetMinutes);
             const dateString = date.toLocaleDateString();
+
             return (
               <BaseView key={recording.day}>
                 <SectionDateHeader title={dateString} />

@@ -114,7 +114,6 @@ export const EventsScreen = () => {
           );
         }}
       />
-      {/* // TODO: Get total event info and group by date. Add pagination heree */}
     </View>
   );
 };
