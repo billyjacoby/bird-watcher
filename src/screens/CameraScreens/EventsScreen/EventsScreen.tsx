@@ -1,21 +1,17 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  LayoutAnimation,
-  SectionList,
-  View,
-} from 'react-native';
+import {LayoutAnimation, SectionList, View} from 'react-native';
 
 import clsx from 'clsx';
 
 import {CameraEvent} from './components';
 import {FrigateEvent, useCameraEvents} from '@api';
-import {BaseText, BaseView} from '@components';
+import {BaseText, BaseView, LoadingView} from '@components';
 import {useAppDataStore} from '@stores';
 import {bgBackground} from '@utils';
 
+import {SectionDateHeader} from '../components';
+
 import {EventListFooter} from './components/EventListFooter';
-import {SectionDateHeader} from './components/SectionDateHeader';
 
 export const EventsScreen = () => {
   const currentCamera = useAppDataStore(state => state.currentCamera);
@@ -63,11 +59,7 @@ export const EventsScreen = () => {
   };
 
   if (isLoading) {
-    return (
-      <BaseView>
-        <ActivityIndicator size={'large'} />
-      </BaseView>
-    );
+    return <LoadingView />;
   }
 
   if (error || !groupedEvents || (!isLoading && !currentCamera)) {
@@ -104,7 +96,7 @@ export const EventsScreen = () => {
         sections={groupedEvents}
         renderSectionHeader={props => (
           <SectionDateHeader
-            {...props}
+            title={props.section.title}
             handleHeaderPress={handleHeaderPress}
             isCollapsed={collapsedSections.has(props.section.title)}
           />
@@ -122,7 +114,6 @@ export const EventsScreen = () => {
           );
         }}
       />
-      {/* // TODO: Get total event info and group by date. Add pagination heree */}
     </View>
   );
 };

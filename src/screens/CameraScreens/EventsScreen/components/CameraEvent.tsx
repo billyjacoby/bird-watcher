@@ -1,17 +1,12 @@
 import React from 'react';
-import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Pressable,
-  ScrollView,
-  useWindowDimensions,
-} from 'react-native';
+import {ScrollView, useWindowDimensions} from 'react-native';
 
+import {useNavigation} from '@react-navigation/native';
 import clsx from 'clsx';
 
 import {EventDetails} from './EventDetails';
 import {FrigateEvent} from '@api';
-import {BaseView, SnapshotCard, VideoPlayer} from '@components';
+import {BaseView, SnapshotCard} from '@components';
 
 export const CameraEvent = ({
   camEvent,
@@ -24,9 +19,9 @@ export const CameraEvent = ({
   const imageWidth = width * 0.97;
   const imageHeight = imageWidth * 0.75;
 
-  const scrollviewRef = React.useRef<ScrollView>(null);
+  const navigation = useNavigation();
 
-  const [videoIsPaused, setVideoIsPaused] = React.useState(true);
+  const scrollviewRef = React.useRef<ScrollView>(null);
 
   const getDateString = (date: Date) => {
     return (
@@ -40,21 +35,12 @@ export const CameraEvent = ({
     );
   };
 
-  const onEventPress = () => {
-    scrollviewRef?.current?.scrollToEnd();
-    setVideoIsPaused(false);
-  };
-
-  const onScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (scrollviewRef.current) {
-      const xOffset = event.nativeEvent.contentOffset.x;
-      const scrollIndex = Math.round(xOffset / width);
-      if (scrollIndex === 2) {
-        setVideoIsPaused(false);
-      } else {
-        setVideoIsPaused(true);
-      }
-    }
+  const onPlayPress = () => {
+    // Open fullscreen player
+    navigation.navigate('Fullscreen Video', {
+      videoURI: camEvent.vodURL,
+      title: 'Event',
+    });
   };
 
   const lastEventEnded = getDateString(new Date(camEvent?.end_time * 1000));
@@ -65,7 +51,6 @@ export const CameraEvent = ({
   return (
     <ScrollView
       ref={scrollviewRef}
-      onMomentumScrollEnd={onScrollEnd}
       horizontal
       contentOffset={{x: width, y: 0}}
       showsHorizontalScrollIndicator={false}
@@ -81,23 +66,12 @@ export const CameraEvent = ({
       {/* //? snapshot in middle, default view */}
       <BaseView style={{width, height: imageHeight}}>
         {(lastEventImage || lastThumbnail) && (
-          <Pressable onPress={onEventPress}>
-            <SnapshotCard
-              camEvent={{...camEvent, lastEventEnded}}
-              imageSource={lastEventImage || lastThumbnail}
-            />
-          </Pressable>
+          <SnapshotCard
+            camEvent={{...camEvent, lastEventEnded}}
+            imageSource={lastEventImage || lastThumbnail}
+            onPlayPress={onPlayPress}
+          />
         )}
-      </BaseView>
-
-      {/* //? if there's a video, show that to the right */}
-      <BaseView style={{width, height: imageHeight}}>
-        <VideoPlayer
-          key={camEvent.id}
-          videoURI={camEvent.vodURL}
-          isPaused={videoIsPaused}
-          snapshotURL={lastEventImage || lastThumbnail}
-        />
       </BaseView>
     </ScrollView>
   );

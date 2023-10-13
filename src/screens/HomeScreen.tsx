@@ -18,7 +18,7 @@ export const HomeScreen = () => {
 
   const onCameraPress = (cameraName: string) => {
     setCurrentCamera(cameraName);
-    navigation.navigate('Tabs', {screen: 'Events'});
+    navigation.navigate('CameraTabs', {screen: 'Events'});
   };
 
   if (isLoading) {

@@ -1,1 +1,1 @@
-export * from './navigationContainer';
+export * from './RootNavigation';
