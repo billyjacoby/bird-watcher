@@ -3,7 +3,7 @@ import {useColorScheme} from 'react-native';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import {EventsScreen, LiveViewScreen} from '@screens';
+import {EventsScreen, LiveViewScreen, RecordingsScreen} from '@screens';
 import {hslToHex} from '@utils';
 
 import {colors} from '../../themeColors.js';
@@ -39,7 +39,7 @@ export const CameraTabNavigator = () => {
       })}>
       <CameraTabStack.Screen name="Live" component={LiveViewScreen} />
       <CameraTabStack.Screen name="Events" component={EventsScreen} />
-      <CameraTabStack.Screen name="Recordings" component={EventsScreen} />
+      <CameraTabStack.Screen name="Recordings" component={RecordingsScreen} />
     </CameraTabStack.Navigator>
   );
 };

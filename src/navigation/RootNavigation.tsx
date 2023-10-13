@@ -13,6 +13,7 @@ import {
 import {LeftHeaderButton, RightHeaderButton} from './components';
 import {
   BirdseyeScreen,
+  FullscreenVideoPlayer,
   HomeScreen,
   OnBoardingScreen,
   SettingsScreen,
@@ -28,6 +29,10 @@ export type MainStackParamList = {
   CameraTabs: NavigatorScreenParams<CameraTabsStackParamList>;
   Settings: undefined;
   Onboarding: undefined;
+  'Fullscreen Video': {
+    videoURI: string;
+    title?: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -87,6 +92,14 @@ export const RootNavigation = () => {
           options={{
             headerBackTitle: 'Home',
             presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="Fullscreen Video"
+          component={FullscreenVideoPlayer}
+          options={{
+            animation: 'slide_from_bottom',
+            headerBackTitleVisible: false,
           }}
         />
       </Stack.Navigator>
