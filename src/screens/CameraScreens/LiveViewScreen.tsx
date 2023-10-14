@@ -1,61 +1,68 @@
+import {Buffer} from 'buffer';
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
 
-import {useAllCameraNames} from '@api';
-import {BaseText, BaseView, WebRTCView} from '@components';
+import RNFS from 'react-native-fs';
+import Video from 'react-native-video';
+import {MediaStream} from 'react-native-webrtc';
+
+import {BaseText, BaseView} from '@components';
+import {API_BASE} from '@env';
 import {useAppDataStore} from '@stores';
 
 export const LiveViewScreen = () => {
-  const defaultCamera = useAppDataStore(state => state.currentCamera);
-  const {data: cameraNames} = useAllCameraNames();
+  const currentCamera = useAppDataStore(state => state.currentCamera);
+  const [videoFilePath, setVideoFilePath] = React.useState(null);
 
-  const defaultIndex = cameraNames?.findIndex(item => item === defaultCamera);
-  const [cameraIndex, setCameraIndex] = React.useState(defaultIndex || 0);
+  const mpegUrl = `${API_BASE.replace(
+    /^http/,
+    'ws',
+  )}live/jsmpeg/${currentCamera}`;
+  const ws = new WebSocket(mpegUrl);
+  // webSocket.onmessage = event => {
+  //   const videoBlob = new Blob([event.data], {type: 'video/mp4'});
+  //   setVideoBlob(videoBlob);
+  // };
 
-  const currentCamera = cameraNames?.[cameraIndex];
+  React.useEffect(() => {
+    const saveVideoToFile = async data => {
+      const filePath = `${RNFS.CachesDirectoryPath}/video.mp4`;
 
-  const onButtonPress = (direction: 'prev' | 'next') => {
-    if (!cameraNames) {
-      return;
-    }
-    if (direction === 'prev') {
-      if (cameraIndex === 0) {
-        setCameraIndex(cameraNames.length - 1);
-      } else {
-        setCameraIndex(prev => prev - 1);
+      try {
+        await RNFS.writeFile(filePath, data, 'base64');
+        setVideoFilePath(filePath);
+      } catch (error) {
+        console.error('Error saving video to file:', error);
       }
-    }
+    };
 
-    if (direction === 'next') {
-      if (cameraIndex === cameraNames.length - 1) {
-        setCameraIndex(0);
-      } else {
-        setCameraIndex(prev => prev + 1);
-      }
-    }
-  };
+    // WebSocket on message event
+    ws.onmessage = event => {
+      // Convert ArrayBuffer to base64 string
+      const videoData = Buffer.from(event.data).toString('base64');
+
+      // Save video to file
+      saveVideoToFile(videoData);
+    };
+
+    // Clean up WebSocket on component unmount
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   return (
     <BaseView className="flex-1">
       <BaseText className="text-3xl mb-4 self-center text-foreground dark:text-foreground-dark">
-        WebRTC Test Screen
+        Live View
       </BaseText>
 
-      <BaseView className="flex-row justify-evenly mb-2">
-        <TouchableOpacity
-          className="px-3 py-2 border border-green-500 rounded-md"
-          onPress={() => onButtonPress('prev')}>
-          <BaseText>Prev Camera</BaseText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="px-3 py-2 border border-green-500 rounded-md"
-          onPress={() => onButtonPress('next')}>
-          <BaseText>Next Camera</BaseText>
-        </TouchableOpacity>
-      </BaseView>
       {currentCamera && (
         <BaseView className="flex-1">
-          <WebRTCView cameraName={currentCamera} key={currentCamera} />
+          {/* <WebRTCView cameraName={currentCamera} key={currentCamera} /> */}
+          <Video
+            source={{uri: `file://${videoFilePath}`}}
+            onError={data => console.error(data)}
+          />
           <BaseText>Viewing: {currentCamera}</BaseText>
         </BaseView>
       )}
