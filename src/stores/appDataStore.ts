@@ -9,17 +9,10 @@ const appDataStore = new MMKV({
   encryptionKey: '',
 });
 
-const zustandStorage: StateStorage = {
-  setItem: (name, value) => {
-    return appDataStore.set(name, value);
-  },
-  getItem: name => {
-    const value = appDataStore.getString(name);
-    return value ?? null;
-  },
-  removeItem: name => {
-    return appDataStore.delete(name);
-  },
+const simpleStorage: StateStorage = {
+  getItem: name => appDataStore.getString(name) || null,
+  setItem: (name, value) => appDataStore.set(name, value),
+  removeItem: name => appDataStore.delete(name),
 };
 
 interface AppDataStore {
@@ -54,16 +47,17 @@ export const useAppDataStore = create<
     }),
     {
       name: 'app-storage',
-      storage: createJSONStorage(() => zustandStorage),
-      // partialize: state =>
-      //   Object.fromEntries(
-      //     Object.entries(state).filter(
-      //       ([key]) =>
-      //         ![
-      //           'userAgent',
-      //         ].includes(key),
+      storage: createJSONStorage(() => simpleStorage),
+      //   partialize: state =>
+      //     Object.fromEntries(
+      //       Object.entries(state).filter(
+      //         ([key]) =>
+      //           ![
+      //             'setEventsToLoad',
+      //             'keyToNotStore',
+      //           ].includes(key),
+      //       ),
       //     ),
-      //   ),
     },
   ),
 );
