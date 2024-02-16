@@ -34,6 +34,7 @@
     "react-native-svg": "^13.14.0",
     "react-native-video": "latest",
     "react-native-webrtc": "111.0.3",
+    "react-native-webview": "^13.8.1",
     "react-query": "^3.39.3",
     "zustand": "^4.4.3"
   },

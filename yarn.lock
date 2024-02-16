@@ -4432,6 +4432,7 @@ __metadata:
     react-native-svg-transformer: ^1.1.0
     react-native-video: latest
     react-native-webrtc: 111.0.3
+    react-native-webview: ^13.8.1
     react-query: ^3.39.3
     react-test-renderer: 18.2.0
     tailwindcss: 3.3.2
@@ -5751,17 +5752,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"escape-string-regexp@npm:2.0.0, escape-string-regexp@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "escape-string-regexp@npm:2.0.0"
+  checksum: 9f8a2d5743677c16e85c810e3024d54f0c8dea6424fad3c79ef6666e81dd0846f7437f5e729dfcdac8981bc9e5294c39b4580814d114076b8d36318f46ae4395
+  languageName: node
+  linkType: hard
+
 "escape-string-regexp@npm:^1.0.3, escape-string-regexp@npm:^1.0.5":
   version: 1.0.5
   resolution: "escape-string-regexp@npm:1.0.5"
   checksum: 6092fda75c63b110c706b6a9bfde8a612ad595b628f0bd2147eea1d3406723020810e591effc7db1da91d80a71a737a313567c5abb3813e8d9c71f4aa595b410
-  languageName: node
-  linkType: hard
-
-"escape-string-regexp@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "escape-string-regexp@npm:2.0.0"
-  checksum: 9f8a2d5743677c16e85c810e3024d54f0c8dea6424fad3c79ef6666e81dd0846f7437f5e729dfcdac8981bc9e5294c39b4580814d114076b8d36318f46ae4395
   languageName: node
   linkType: hard
 
@@ -7033,7 +7034,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:*, invariant@npm:^2.2.4":
+"invariant@npm:*, invariant@npm:2.2.4, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -10521,6 +10522,19 @@ __metadata:
   peerDependencies:
     react-native: ">=0.60.0"
   checksum: de951a1ffdf7fd19459c651c878141a76ca45f34a303fb185644601812a9fd5af9b5354fd0008865385c9079948a0f38f8e08f9ec467c8eb2dd381f246301cd8
+  languageName: node
+  linkType: hard
+
+"react-native-webview@npm:^13.8.1":
+  version: 13.8.1
+  resolution: "react-native-webview@npm:13.8.1"
+  dependencies:
+    escape-string-regexp: 2.0.0
+    invariant: 2.2.4
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 1760405dcd601c4f5a6e8b9f35f7eaf8e4107a47861037f4f73a7e39a3a6d10824fd76a04454266ff99e40742aedbf02aacca4b548b5744c96d22ebcacc97f04
   languageName: node
   linkType: hard
 

@@ -2,7 +2,7 @@ import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
 import {useAllCameraNames} from '@api';
-import {BaseText, BaseView, WebRTCView} from '@components';
+import {BaseText, BaseView, LiveWebView} from '@components';
 import {useAppDataStore} from '@stores';
 
 export const LiveViewScreen = () => {
@@ -55,7 +55,7 @@ export const LiveViewScreen = () => {
       </BaseView>
       {currentCamera && (
         <BaseView className="flex-1">
-          <WebRTCView cameraName={currentCamera} key={currentCamera} />
+          <LiveWebView cameraName={currentCamera} />
           <BaseText>Viewing: {currentCamera}</BaseText>
         </BaseView>
       )}
